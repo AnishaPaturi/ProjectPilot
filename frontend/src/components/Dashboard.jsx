@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { recommendationsAPI } from '../services/api';
-import { Sparkles, FileText, Download, ChevronDown, ChevronUp, Calendar, ArrowRight, Layers, Cpu, Award, Search, BookOpen, AlertCircle, X } from 'lucide-react';
+import { Sparkles, FileText, Download, ChevronDown, ChevronUp, ArrowRight, Layers, Cpu, Award, Brain, Shield, Link as LinkIcon, Cloud, Network, AlertCircle, X } from 'lucide-react';
 
 export default function Dashboard({ userId }) {
   const [papers, setPapers] = useState([]);
@@ -10,11 +10,50 @@ export default function Dashboard({ userId }) {
   const [expandedPaper, setExpandedPaper] = useState(null);
   const [activeTabs, setActiveTabs] = useState({}); // { paperId: 'roadmap' | 'modules' | 'details' }
 
-  // Step Wizard States: 'idle' | 'enter-domain' | 'select-subdomain'
+  // Step Wizard States: 'idle' | 'select-broad-domain' | 'select-subdomain' | 'generating'
   const [wizardStep, setWizardStep] = useState('idle');
-  const [broadDomain, setBroadDomain] = useState('');
+  const [selectedBroadDomain, setSelectedBroadDomain] = useState('');
   const [subdomains, setSubdomains] = useState([]);
   const [selectedSubdomain, setSelectedSubdomain] = useState('');
+
+  // Pre-defined CSE Broad Domains suggested by the agent
+  const agentSuggestedDomains = [
+    {
+      id: 'ai-ml',
+      name: 'Artificial Intelligence & Machine Learning',
+      description: 'Computer Vision, Natural Language Processing, Neural Networks, and Predictive Analytics.',
+      icon: <Brain size={24} className="text-pink-400" />,
+      colorClass: 'hover:border-pink-500/40 hover:bg-pink-500/5'
+    },
+    {
+      id: 'cybersecurity',
+      name: 'Cybersecurity & Cryptography',
+      description: 'Network Defense, Intrusion Detection, Malware Analysis, and Zero-Knowledge Proofs.',
+      icon: <Shield size={24} className="text-emerald-400" />,
+      colorClass: 'hover:border-emerald-500/40 hover:bg-emerald-500/5'
+    },
+    {
+      id: 'blockchain',
+      name: 'Blockchain & Distributed Ledger',
+      description: 'Smart Contracts, Decentralized Apps (dApps), Consensuses, and Smart Ledger security.',
+      icon: <LinkIcon size={24} className="text-amber-400" />,
+      colorClass: 'hover:border-amber-500/40 hover:bg-amber-500/5'
+    },
+    {
+      id: 'cloud',
+      name: 'Cloud Computing & Virtualization',
+      description: 'Serverless Architectures, Container Orchestration, Edge Nodes, and Distributed Systems.',
+      icon: <Cloud size={24} className="text-sky-400" />,
+      colorClass: 'hover:border-sky-500/40 hover:bg-sky-500/5'
+    },
+    {
+      id: 'iot',
+      name: 'Internet of Things & Smart Systems',
+      description: 'Cyber-Physical Systems, Sensor networks, Smart Cities, and Edge AI nodes.',
+      icon: <Cpu size={24} className="text-indigo-400" />,
+      colorClass: 'hover:border-indigo-500/40 hover:bg-indigo-500/5'
+    }
+  ];
 
   const fetchSavedRecommendations = async () => {
     try {
@@ -32,31 +71,29 @@ export default function Dashboard({ userId }) {
   }, [userId]);
 
   const handleStartWizard = () => {
-    setBroadDomain('');
+    setSelectedBroadDomain('');
     setSubdomains([]);
     setSelectedSubdomain('');
     setError('');
-    setWizardStep('enter-domain');
+    setWizardStep('select-broad-domain');
   };
 
-  const handleFetchSubdomains = async (e) => {
-    e.preventDefault();
-    if (!broadDomain.trim()) return;
-
+  const handleSelectBroadDomain = async (domainName) => {
+    setSelectedBroadDomain(domainName);
     setLoading(true);
     setError('');
     try {
-      const response = await recommendationsAPI.suggestSubdomains(broadDomain.trim());
-      // The response.data should contain "subdomains"
+      const response = await recommendationsAPI.suggestSubdomains(domainName);
       const data = response.data || {};
       const list = data.subdomains || [];
       if (list.length === 0) {
-        throw new Error("No subdomains returned. Please try a different query.");
+        throw new Error("No research subdomains were returned for this topic.");
       }
       setSubdomains(list);
       setWizardStep('select-subdomain');
     } catch (err) {
-      setError(err.response?.data || err.message || 'Failed to fetch subdomains from AI model.');
+      setError(err.response?.data || err.message || 'Failed to suggest subdomains.');
+      setWizardStep('select-broad-domain');
     } finally {
       setLoading(false);
     }
@@ -73,7 +110,7 @@ export default function Dashboard({ userId }) {
       setWizardStep('idle');
     } catch (err) {
       setError(err.response?.data || 'Failed to generate recommendations. Please save your avoid list first.');
-      setWizardStep('select-subdomain'); // Rollback so they can try again
+      setWizardStep('select-subdomain');
     } finally {
       setLoading(false);
     }
@@ -107,63 +144,76 @@ export default function Dashboard({ userId }) {
   }
 
   return (
-    <div className="space-y-8">
-      {/* 1. Enter Broad Domain Step */}
-      {wizardStep === 'enter-domain' && (
-        <div className="glass-panel rounded-2xl p-8 shadow-2xl relative max-w-2xl mx-auto border border-indigo-500/10">
-          <button 
-            onClick={() => setWizardStep('idle')} 
-            className="absolute top-4 right-4 text-slate-500 hover:text-slate-200 transition-colors"
-          >
-            <X size={20} />
-          </button>
-          
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-slate-100 flex items-center justify-center gap-2">
-              <Sparkles className="text-indigo-400 animate-pulse" size={24} />
-              Domain Finder
-            </h2>
-            <p className="text-slate-400 text-sm mt-2">
-              Enter a broad topic of interest to suggest research subdomains
-            </p>
+    <div className="space-y-8 text-left">
+      {/* 1. Select Agent-Suggested Broad Domain Step */}
+      {wizardStep === 'select-broad-domain' && (
+        <div className="space-y-6 max-w-4xl mx-auto">
+          <div className="glass-panel rounded-2xl p-6 flex justify-between items-center border border-slate-900 shadow-xl relative">
+            <div>
+              <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+                <Sparkles className="text-indigo-400 animate-pulse" size={22} />
+                Select Research Domain
+              </h2>
+              <p className="text-slate-400 text-xs mt-1">
+                Choose a trending CSE domain suggested by the agent
+              </p>
+            </div>
+            <button 
+              onClick={() => setWizardStep('idle')} 
+              className="p-2 text-slate-500 hover:text-slate-200 transition-colors"
+            >
+              <X size={20} />
+            </button>
           </div>
 
-          <form onSubmit={handleFetchSubdomains} className="space-y-4">
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-600">
-                <Search size={18} />
-              </span>
-              <input
-                type="text"
-                required
-                value={broadDomain}
-                onChange={(e) => setBroadDomain(e.target.value)}
-                placeholder="e.g. Artificial Intelligence, Cryptography, Blockchain, Cloud Security..."
-                className="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl py-3.5 pl-10 pr-4 text-slate-100 placeholder-slate-700 outline-none transition-all text-sm"
-              />
+          {loading ? (
+            <div className="glass-panel rounded-2xl p-12 text-center flex flex-col items-center justify-center space-y-4">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500"></div>
+              <p className="text-slate-400 text-sm">Analyzing domain & requesting subdomains...</p>
             </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              {loading ? 'Analyzing Domain...' : 'Suggest Subdomains'}
-            </button>
-          </form>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {agentSuggestedDomains.map((dom) => (
+                <div
+                  key={dom.id}
+                  onClick={() => handleSelectBroadDomain(dom.name)}
+                  className={`glass-panel rounded-2xl p-6 border border-slate-900 transition-all cursor-pointer space-y-4 flex flex-col justify-between group ${dom.colorClass}`}
+                >
+                  <div className="space-y-2">
+                    <div className="p-3 bg-slate-900/80 rounded-xl w-fit group-hover:scale-110 transition-transform">
+                      {dom.icon}
+                    </div>
+                    <h3 className="font-bold text-slate-200 group-hover:text-indigo-300 transition-colors text-base pt-2">
+                      {dom.name}
+                    </h3>
+                    <p className="text-slate-500 text-xs leading-relaxed">
+                      {dom.description}
+                    </p>
+                  </div>
+                  <div className="text-indigo-400 text-xs font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform self-end">
+                    <span>Explore Subdomains</span>
+                    <ArrowRight size={12} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {/* 2. Select Subdomain Step */}
       {wizardStep === 'select-subdomain' && (
         <div className="space-y-6 max-w-3xl mx-auto">
-          <div className="glass-panel rounded-2xl p-6 flex justify-between items-center border border-slate-800">
+          <div className="glass-panel rounded-2xl p-6 flex justify-between items-center border border-slate-900 shadow-xl">
             <div>
-              <h2 className="text-lg font-bold text-slate-100">Select a Suggested Subdomain</h2>
-              <p className="text-slate-400 text-xs mt-0.5">Based on your input: "{broadDomain}"</p>
+              <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+                <Layers className="text-indigo-400" size={20} />
+                Select Specific Subdomain
+              </h2>
+              <p className="text-slate-400 text-xs mt-1">Subdomain options for: <strong>{selectedBroadDomain}</strong></p>
             </div>
             <button
-              onClick={() => setWizardStep('enter-domain')}
+              onClick={() => setWizardStep('select-broad-domain')}
               className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-semibold rounded-xl transition-all cursor-pointer border border-slate-800"
             >
               Go Back
@@ -175,15 +225,20 @@ export default function Dashboard({ userId }) {
               <div
                 key={idx}
                 onClick={() => handleSelectSubdomainAndGenerate(sub.name)}
-                className="glass-panel rounded-2xl p-6 border border-slate-900 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all cursor-pointer space-y-3 group text-left"
+                className="glass-panel rounded-2xl p-6 border border-slate-900 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all cursor-pointer space-y-3 group flex flex-col justify-between"
               >
-                <h3 className="font-bold text-slate-200 group-hover:text-indigo-400 transition-colors text-base flex justify-between items-center">
-                  <span>{sub.name}</span>
-                  <ArrowRight size={14} className="text-slate-600 group-hover:text-indigo-400 transition-all group-hover:translate-x-1" />
-                </h3>
-                <p className="text-slate-400 text-xs leading-relaxed">
-                  {sub.description}
-                </p>
+                <div className="space-y-2">
+                  <h3 className="font-bold text-slate-200 group-hover:text-indigo-400 transition-colors text-base flex justify-between items-center">
+                    <span>{sub.name}</span>
+                  </h3>
+                  <p className="text-slate-400 text-xs leading-relaxed">
+                    {sub.description}
+                  </p>
+                </div>
+                <div className="text-indigo-400 text-xs font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform self-end pt-2">
+                  <span>Generate Roadmap</span>
+                  <ArrowRight size={12} />
+                </div>
               </div>
             ))}
           </div>
@@ -218,7 +273,7 @@ export default function Dashboard({ userId }) {
                 IEEE Recommendations & Plan Generator
               </h2>
               <p className="text-slate-400 text-xs mt-1">
-                Enter your research domain, choose a tailored subdomain, and compile roadmaps instantly
+                Choose a trending CSE research domain, pick a subdomain, and automatically compile paper roadmaps.
               </p>
             </div>
             <button
@@ -270,7 +325,7 @@ export default function Dashboard({ userId }) {
                 return (
                   <div 
                     key={paper.id} 
-                    className="glass-panel rounded-2xl overflow-hidden border border-slate-900 hover:border-slate-800 transition-all shadow-xl"
+                    className="glass-panel rounded-2xl overflow-hidden border border-slate-900 hover:border-slate-800 transition-all shadow-xl bg-slate-950/10"
                   >
                     {/* Paper Header / Overview */}
                     <div 
@@ -289,7 +344,7 @@ export default function Dashboard({ userId }) {
                         <h3 className="text-xl font-bold text-slate-100 hover:text-indigo-400 transition-colors leading-snug">
                           {paper.title}
                         </h3>
-                        <p className="text-slate-400 text-xs italic">
+                        <p className="text-slate-400 text-xs italic text-left">
                           By {paper.authors}
                         </p>
                       </div>
