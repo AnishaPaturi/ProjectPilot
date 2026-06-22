@@ -1,0 +1,381 @@
+Project Title
+
+ProjectPilot AI
+
+AI Agent for IEEE Research Paper Recommendation and Major Project Planning
+Problem Statement
+
+Final-year students spend days or weeks searching for a suitable project paper.
+
+Current problems:
+
+Students don't know which domain to choose.
+Many select conference papers by mistake.
+Papers may be too difficult to implement.
+Students accidentally pick topics already chosen by classmates.
+Faculty often reject papers because they are surveys or old publications.
+Students don't know whether a paper has scope for innovation.
+
+ProjectPilot AI solves this by automatically recommending suitable IEEE journal papers based on student interests and constraints.
+
+Core Features (MVP)
+1. Student Profile Collection
+
+Input:
+
+Name
+Branch
+Domain
+Skills
+Preferred Technologies
+Team Size
+Project Duration
+
+Example:
+
+Domain: Cybersecurity + AI
+Skills: Java, Python
+Team Size: 4
+Duration: 4 Months
+2. Avoid List Module
+
+Student enters projects they don't want.
+
+Example:
+
+Avoid:
+Fake News Detection
+Network Intrusion Detection
+Blockchain Voting
+
+The agent removes similar papers.
+
+3. IEEE Paper Search Agent
+
+Searches:
+
+IEEE Journals
+IEEE Transactions
+IEEE Access
+IEEE Intelligent Systems
+
+Filters:
+
+Year = 2025 or 2026
+Journal only
+Not Conference
+Not Survey
+Not Review
+4. AI Evaluation Agent
+
+For every paper:
+
+Scores:
+
+Implementation Difficulty
+Innovation
+Publication Potential
+Cost
+Dataset Availability
+5. Recommendation Agent
+
+Ranks papers.
+
+Example:
+
+1. Paper A
+Score: 95
+
+2. Paper B
+Score: 91
+
+3. Paper C
+Score: 88
+6. Project Expansion Agent
+
+For each paper:
+
+Generates:
+
+Modules
+Architecture
+Novelty Additions
+Tech Stack
+Implementation Roadmap
+7. PDF Report Generator
+
+Download:
+
+Recommended Paper
+Reason
+IEEE Link
+Novel Features
+Implementation Plan
+System Architecture
+Frontend
+   |
+   V
+
+Spring Boot Backend
+   |
+   +----------------+
+   |                |
+   V                V
+
+ Gemini API    MySQL
+
+   |
+   V
+
+IEEE Search Engine
+
+   |
+   V
+
+Recommendation Engine
+
+   |
+   V
+
+PDF Generator
+Recommended Tech Stack
+
+Since you're a CSE student and likely to be evaluated on implementation quality:
+
+Frontend
+React
+
+Why?
+
+Modern UI
+Easy forms
+Easy dashboards
+
+Libraries:
+
+React
+Tailwind CSS
+Axios
+React Router
+Backend
+Spring Boot
+
+Why?
+
+Industry standard
+Easy APIs
+Strong resume value
+
+Modules:
+
+Spring Web
+Spring Data JPA
+Spring Security
+Database
+MySQL
+
+Tables:
+
+users
+student_preferences
+avoid_projects
+recommended_papers
+search_history
+AI
+Gemini API
+
+Tasks:
+
+Domain analysis
+Paper ranking
+Similarity checking
+Novelty generation
+PDF Generation
+OpenPDF
+iText
+Database Design
+users
+id
+name
+email
+password
+preferences
+id
+user_id
+domain
+skills
+team_size
+duration
+avoid_list
+id
+user_id
+project_name
+papers
+id
+title
+authors
+year
+journal
+doi
+link
+abstract
+score
+AI Agent Flow
+Agent 1
+
+Domain Analyzer
+
+Input:
+
+Cybersecurity + AI
+
+Output:
+
+Top Subdomains:
+Malware Analysis
+Threat Intelligence
+Fraud Detection
+Agent 2
+
+Paper Search Agent
+
+Collects papers.
+
+Agent 3
+
+Paper Verification Agent
+
+Checks:
+
+IEEE?
+Journal?
+2025/26?
+Not Conference?
+Agent 4
+
+Similarity Agent
+
+Checks against:
+
+Avoid List
+
+Removes similar projects.
+
+Agent 5
+
+Ranking Agent
+
+Calculates:
+
+Difficulty
+Novelty
+Feasibility
+Publication Scope
+Agent 6
+
+Project Planning Agent
+
+Generates:
+
+Modules
+Roadmap
+Architecture
+Tech Stack
+Development Roadmap
+Week 1
+
+Frontend Forms
+
+Student Profile
+Preferences
+Avoid List
+Week 2
+
+Spring Boot APIs
+
+Login
+Save Preferences
+Fetch Recommendations
+Week 3
+
+Gemini Integration
+
+Prompt Engineering
+Recommendation Engine
+Week 4
+
+IEEE Search Module
+
+Paper Collection
+Filtering
+Week 5
+
+Similarity Engine
+
+Avoid List Matching
+Week 6
+
+PDF Report Generator
+
+Week 7
+
+Dashboard
+
+Past Searches
+Saved Papers
+Week 8
+
+Testing and Deployment
+
+Advanced Features (for extra marks)
+RAG Pipeline
+
+Store paper abstracts in:
+
+ChromaDB
+Pinecone
+FAISS
+
+Then perform semantic search instead of keyword search.
+
+Multi-Agent Architecture
+
+Using:
+
+LangGraph
+CrewAI
+
+Agents:
+
+Research Agent
+Verifier Agent
+Scoring Agent
+Planning Agent
+Faculty Approval Module
+
+Faculty can:
+
+Accept Paper
+Reject Paper
+Add Remarks
+Why this project is strong
+
+Most students build:
+
+Chatbots
+Resume screeners
+Fake news detectors
+
+Very few build something that directly helps engineering students select research papers and plan a final-year project.
+
+It combines:
+
+AI Agents
+LLMs
+Research Automation
+Recommendation Systems
+Semantic Search
+Full-Stack Development
+
+which makes it a solid mini-project and can even be extended into a major project later. 🚀
+
