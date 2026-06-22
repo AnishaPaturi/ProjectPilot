@@ -17,4 +17,5 @@ frontend/dist/
 frontend/node_modules/
 
 # Local sensitive configuration files
-backend/src/main/resources/application.properties
+application.properties
+**/application.properties
