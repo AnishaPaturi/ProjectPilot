@@ -201,12 +201,7 @@ public class PdfService {
         String doi = paper.getDoi();
         String link = paper.getLink();
 
-        // 1. Try Sci-Hub for free immediate full-text PDF access using DOI
-        if (doi != null && !doi.trim().isEmpty() && !doi.toLowerCase().contains("N/A")) {
-            return "https://sci-hub.se/" + doi.trim();
-        }
-
-        // 2. Try converting abstract IEEE Xplore link to stamp PDF viewer link
+        // 1. Try converting abstract IEEE Xplore link to stamp PDF viewer link first (never blocked)
         if (link != null && link.contains("ieeexplore.ieee.org/document/")) {
             String[] parts = link.split("/document/");
             if (parts.length > 1) {
@@ -215,6 +210,11 @@ public class PdfService {
                     return "https://ieeexplore.ieee.org/stampPDF/getPDF.jsp?tp=&arnumber=" + arnumber;
                 }
             }
+        }
+
+        // 2. Try official DOI link (never blocked)
+        if (doi != null && !doi.trim().isEmpty() && !doi.toLowerCase().contains("N/A")) {
+            return "https://doi.org/" + doi.trim();
         }
 
         // 3. Fallback to standard link
