@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/recommendations")
@@ -28,15 +29,30 @@ public class RecommendationController {
         this.pdfService = pdfService;
     }
 
-    @PostMapping("/generate/{userId}")
-    public ResponseEntity<?> generateRecommendations(@PathVariable Long userId) {
+    @PostMapping("/suggest-subdomains")
+    public ResponseEntity<?> suggestSubdomains(@RequestBody Map<String, String> request) {
         try {
-            List<RecommendedPaper> papers = recommendationService.generateRecommendations(userId);
+            String domain = request.get("domain");
+            String resultJson = recommendationService.suggestSubdomains(domain);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(resultJson);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/generate/{userId}")
+    public ResponseEntity<?> generateRecommendations(@PathVariable Long userId, @RequestBody Map<String, String> request) {
+        try {
+            String subdomain = request.get("subdomain");
+            List<RecommendedPaper> papers = recommendationService.generateRecommendations(userId, subdomain);
             return ResponseEntity.ok(papers);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
     @GetMapping("/saved/{userId}")
     public ResponseEntity<?> getSavedRecommendations(@PathVariable Long userId) {

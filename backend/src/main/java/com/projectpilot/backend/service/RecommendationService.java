@@ -23,43 +23,37 @@ public class RecommendationService {
     private final UserRepository userRepository;
     private final StudentPreferencesRepository preferencesRepository;
     private final RecommendedPaperRepository recommendedPaperRepository;
-    private final PreferencesService preferencesService;
     private final GeminiService geminiService;
     private final ObjectMapper objectMapper;
 
     public RecommendationService(UserRepository userRepository,
                                  StudentPreferencesRepository preferencesRepository,
                                  RecommendedPaperRepository recommendedPaperRepository,
-                                 PreferencesService preferencesService,
                                  GeminiService geminiService) {
         this.userRepository = userRepository;
         this.preferencesRepository = preferencesRepository;
         this.recommendedPaperRepository = recommendedPaperRepository;
-        this.preferencesService = preferencesService;
         this.geminiService = geminiService;
         this.objectMapper = new ObjectMapper();
     }
 
     @Transactional
-    public List<RecommendedPaper> generateRecommendations(Long userId) {
+    public List<RecommendedPaper> generateRecommendations(Long userId, String subdomain) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found!"));
 
-        StudentPreferences preferences = preferencesRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Please configure your project preferences first!"));
-
-        var fullPreferences = preferencesService.getPreferences(userId);
-        String avoidListStr = String.join(", ", fullPreferences.getAvoidList());
+        List<AvoidProject> avoidProjects = avoidProjectRepository.findByUserId(userId);
+        List<String> avoidList = avoidProjects.stream().map(AvoidProject::getProjectName).collect(Collectors.toList());
+        String avoidListStr = String.join(", ", avoidList);
 
         // Construct the multi-agent pipeline prompt
         String prompt = String.format(
             "You are a Multi-Agent IEEE Paper Recommender and Project Planner System. Run the following workflow:\n" +
-            "1. Domain Analyzer Agent: Analyze the domain '%s' and generate subdomains.\n" +
-            "2. Paper Search Agent: Retrieve 3 highly realistic, high-fidelity IEEE journal or transaction papers published in 2025 or 2026.\n" +
-            "3. Paper Verification Agent: Verify each paper. Ensure it is an IEEE Journal or Transaction paper (e.g. IEEE Transactions on Cloud Computing, IEEE Access, IEEE Journal of IoT). Ensure it is NOT a conference paper, survey paper, or review paper. It must have a valid-looking DOI and IEEE Xplore link.\n" +
-            "4. Similarity Agent: Filter out any papers that are similar or related to the following user avoid list: [%s]. If a paper is similar, replace it with a completely different topic.\n" +
-            "5. Ranking Agent: Rate each paper out of 100 based on feasibility, novelty, publication scope, and alignment with user skills (%s), team size (%d members), and duration (%d months).\n" +
-            "6. Project Planning Agent: For each paper, detail a complete implementation plan including sub-modules, architecture description, novelty additions, tech stack, and a week-by-week implementation roadmap.\n\n" +
+            "1. Paper Search Agent: Retrieve 3 highly realistic, high-fidelity IEEE journal or transaction papers published in 2025 or 2026 specifically about the subdomain: '%s'.\n" +
+            "2. Paper Verification Agent: Verify each paper. Ensure it is an IEEE Journal or Transaction paper (e.g. IEEE Transactions on Cloud Computing, IEEE Access, IEEE Journal of IoT). Ensure it is NOT a conference paper, survey paper, or review paper. It must have a valid-looking DOI and IEEE Xplore link.\n" +
+            "3. Similarity Agent: Filter out any papers that are similar or related to the following user avoid list: [%s]. If a paper is similar, replace it with a completely different topic.\n" +
+            "4. Ranking Agent: Rate each paper out of 100 based on feasibility for a standard CSE final-year major project, implementation difficulty, innovation, and publication scope.\n" +
+            "5. Project Planning Agent: For each paper, detail a complete implementation plan including sub-modules, architecture description, novelty additions, tech stack, and a week-by-week implementation roadmap.\n\n" +
             "Return the output in a single, valid JSON object with the following schema:\n" +
             "{\n" +
             "  \"papers\": [\n" +
@@ -68,7 +62,7 @@ public class RecommendationService {
             "      \"authors\": \"Author Names\",\n" +
             "      \"year\": 2025 or 2026,\n" +
             "      \"journal\": \"IEEE Journal Name\",\n" +
-            "      \"doi\": \"10.1109/...\u0000\",\n" +
+            "      \"doi\": \"10.1109/...\",\n" +
             "      \"link\": \"IEEE Xplore URL\",\n" +
             "      \"abstract\": \"Abstract describing the research problem, methodology, and results\",\n" +
             "      \"score\": 85.5,\n" +
@@ -87,11 +81,8 @@ public class RecommendationService {
             "  ]\n" +
             "}\n\n" +
             "Make sure the response contains ONLY valid JSON and nothing else.",
-            preferences.getDomain(),
-            avoidListStr,
-            preferences.getSkills(),
-            preferences.getTeamSize(),
-            preferences.getDuration()
+            subdomain,
+            avoidListStr
         );
 
         String jsonResponse = geminiService.generateContent(prompt, true);
@@ -133,11 +124,30 @@ public class RecommendationService {
             }
         } catch (Exception e) {
             System.err.println("Failed to parse Gemini response for recommendations: " + e.getMessage());
-            // Return empty list or throw exception depending on policy
             e.printStackTrace();
         }
 
         return recommendedPapersList;
+    }
+
+    @Transactional
+    public String suggestSubdomains(String domain) {
+        String prompt = String.format(
+            "You are a Research Domain Analyzer. Given a broad domain of interest: '%s', suggest 4 specific, relevant, and cutting-edge final-year CSE project subdomains.\n" +
+            "Return the output in a strict JSON format matching the following schema:\n" +
+            "{\n" +
+            "  \"subdomains\": [\n" +
+            "    {\n" +
+            "      \"name\": \"Subdomain Name\",\n" +
+            "      \"description\": \"Brief explanation of what this research subdomain entails and why it makes a strong major project\"\n" +
+            "    }\n" +
+            "  ]\n" +
+            "}\n\n" +
+            "Make sure the response contains ONLY valid JSON and nothing else.",
+            domain
+        );
+
+        return geminiService.generateContent(prompt, true);
     }
 
     @Transactional(readOnly = true)

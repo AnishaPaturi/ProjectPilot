@@ -3,7 +3,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import PreferencesForm from './components/PreferencesForm';
 import Dashboard from './components/Dashboard';
-import { Compass, Settings, LogOut, BookOpen } from 'lucide-react';
+import { Compass, FileX, LogOut, BookOpen } from 'lucide-react';
 import './App.css';
 
 function App() {
@@ -85,8 +85,8 @@ function App() {
                     : 'text-slate-400 hover:text-slate-200 border border-transparent'
                 }`}
               >
-                <Settings size={16} />
-                <span className="hidden sm:inline">Settings</span>
+                <FileX size={16} />
+                <span className="hidden sm:inline">Avoid List</span>
               </button>
 
               <div className="w-[1px] h-6 bg-slate-800"></div>
