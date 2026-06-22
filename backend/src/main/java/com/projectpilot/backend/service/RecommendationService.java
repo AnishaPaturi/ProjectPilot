@@ -55,7 +55,7 @@ public class RecommendationService {
         String prompt = String.format(
             "You are a Multi-Agent IEEE Paper Recommender and Project Planner System. Run the following workflow:\n" +
             "1. Paper Search Agent: Retrieve 3 highly realistic, high-fidelity IEEE journal or transaction papers published in 2025 or 2026 specifically about the subdomain: '%s'.\n" +
-            "2. Paper Verification Agent: Verify each paper. Ensure it is an IEEE Journal or Transaction paper (e.g. IEEE Transactions on Cloud Computing, IEEE Access, IEEE Journal of IoT). Ensure it is NOT a conference paper, survey paper, or review paper. It must have a valid-looking DOI and IEEE Xplore link.\n" +
+            "2. Paper Verification Agent: Verify each paper. Ensure it is an IEEE Journal or Transaction paper (e.g. IEEE Transactions on Cloud Computing, IEEE Access, IEEE Journal of IoT). Ensure it is NOT a conference paper, survey paper, or review paper. It must have a valid-looking DOI and IEEE Xplore link. Conference papers, workshop papers, or symposium proceedings are STRICTLY PROHIBITED and must not be returned.\n" +
             "3. Similarity Agent: Filter out any papers that are similar or related to the following user avoid list: [%s]. If a paper is similar, replace it with a completely different topic.\n" +
             "4. Ranking Agent: Rate each paper out of 100 based on feasibility for a standard CSE final-year major project, implementation difficulty, innovation, and publication scope.\n" +
             "5. Project Planning Agent: For each paper, detail a complete implementation plan including sub-modules, architecture description, novelty additions, tech stack, and a week-by-week implementation roadmap.\n\n" +
@@ -66,7 +66,7 @@ public class RecommendationService {
             "      \"title\": \"Paper Title\",\n" +
             "      \"authors\": \"Author Names\",\n" +
             "      \"year\": 2025 or 2026,\n" +
-            "      \"journal\": \"IEEE Journal Name\",\n" +
+            "      \"journal\": \"IEEE Journal or Transactions Name (e.g. IEEE Transactions on Smart Grid. MUST NOT be a conference or proceedings)\",\n" +
             "      \"doi\": \"10.1109/...\",\n" +
             "      \"link\": \"IEEE Xplore URL\",\n" +
             "      \"abstract\": \"Abstract describing the research problem, methodology, and results\",\n" +
@@ -102,6 +102,17 @@ public class RecommendationService {
                 recommendedPaperRepository.deleteByUserId(userId);
 
                 for (Map<String, Object> paperMap : papersJson) {
+                    String journal = (String) paperMap.get("journal");
+                    if (journal != null) {
+                        String lowerJournal = journal.toLowerCase();
+                        if (lowerJournal.contains("conference") || lowerJournal.contains("proceedings") ||
+                            lowerJournal.contains("workshop") || lowerJournal.contains("symposium") ||
+                            lowerJournal.contains("conf.") || lowerJournal.contains("conf ")) {
+                            System.out.println("Skipping conference paper: " + paperMap.get("title") + " from " + journal);
+                            continue; // Skip conference papers
+                        }
+                    }
+
                     Object planObj = paperMap.get("implementationPlan");
                     String planJsonString = planObj != null ? objectMapper.writeValueAsString(planObj) : "";
 
@@ -116,7 +127,7 @@ public class RecommendationService {
                             .title((String) paperMap.get("title"))
                             .authors((String) paperMap.get("authors"))
                             .year(yearVal)
-                            .journal((String) paperMap.get("journal"))
+                            .journal(journal)
                             .doi((String) paperMap.get("doi"))
                             .link((String) paperMap.get("link"))
                             .abstractText((String) paperMap.get("abstract"))

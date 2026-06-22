@@ -53,11 +53,34 @@ public class PdfService {
             metaTable.setWidths(new float[]{1.5f, 5.5f});
             metaTable.setSpacingAfter(15);
 
-            addMetaRow(metaTable, "Paper Title:", paper.getTitle(), bodyBoldFont, bodyFont);
+            // Paper Title (Hyperlink to download/view)
+            String paperUrl = paper.getLink();
+            if (paperUrl == null || paperUrl.trim().isEmpty()) {
+                if (paper.getDoi() != null && !paper.getDoi().trim().isEmpty()) {
+                    paperUrl = "https://doi.org/" + paper.getDoi();
+                } else {
+                    paperUrl = "#";
+                }
+            }
+
+            PdfPCell titleLabelCell = new PdfPCell(new Phrase("Paper Title:", bodyBoldFont));
+            titleLabelCell.setBorder(Rectangle.NO_BORDER);
+            titleLabelCell.setPadding(4);
+
+            Font titleLinkFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, Font.UNDERLINE, new Color(44, 82, 130)); // Underlined Blue Link
+            Anchor titleAnchor = new Anchor(paper.getTitle(), titleLinkFont);
+            titleAnchor.setReference(paperUrl);
+
+            PdfPCell titleValueCell = new PdfPCell(titleAnchor);
+            titleValueCell.setBorder(Rectangle.NO_BORDER);
+            titleValueCell.setPadding(4);
+
+            metaTable.addCell(titleLabelCell);
+            metaTable.addCell(titleValueCell);
+
             addMetaRow(metaTable, "Authors:", paper.getAuthors(), bodyBoldFont, bodyFont);
             addMetaRow(metaTable, "Journal:", paper.getJournal() + " (" + paper.getYear() + ")", bodyBoldFont, bodyFont);
             addMetaRow(metaTable, "DOI / Link:", paper.getDoi(), bodyBoldFont, bodyFont);
-            addMetaRow(metaTable, "Pilot Score:", String.format("%.1f / 100", paper.getScore()), bodyBoldFont, bodyFont);
 
             document.add(metaTable);
 
