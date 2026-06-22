@@ -112,12 +112,12 @@ public class GeminiService {
             {
               "papers": [
                 {
-                  "title": "DeepMalAnal: A Multimodal Deep Learning Approach for 2026 Polymorphic Malware Detection",
+                  "title": "Deep Learning-Based Intrusion Detection System for Internet of Things: A Review",
                   "authors": "J. Doe, K. Smith",
-                  "year": 2026,
-                  "journal": "IEEE Transactions on Information Forensics and Security",
-                  "doi": "10.1109/TIFS.2026.1234567",
-                  "link": "https://ieeexplore.ieee.org/document/1234567",
+                  "year": 2024,
+                  "journal": "IEEE Access",
+                  "doi": "10.1109/ACCESS.2023.3339824",
+                  "link": "https://ieeexplore.ieee.org/document/10360814",
                   "abstract": "Traditional signature-based malware detection systems fail to recognize advanced polymorphic malware. This paper proposes DeepMalAnal, a multimodal neural network that integrates static API call sequences and dynamic control-flow-graph features. Our approach achieves 99.4% accuracy on the 2025 malware dataset and provides robustness against adversarial evasion techniques.",
                   "score": 94.5,
                   "difficulty": "Medium",
@@ -125,12 +125,12 @@ public class GeminiService {
                   "feasibility": "High"
                 },
                 {
-                  "title": "SecNLP: Extracting Threat Intelligence from Security Blogs Using Transformer Ensembles",
+                  "title": "Security and Privacy in Cloud Computing: A Survey",
                   "authors": "A. Gupta, M. Patel",
-                  "year": 2025,
+                  "year": 2023,
                   "journal": "IEEE Access",
-                  "doi": "10.1109/ACCESS.2025.7654321",
-                  "link": "https://ieeexplore.ieee.org/document/7654321",
+                  "doi": "10.1109/ACCESS.2023.3273187",
+                  "link": "https://ieeexplore.ieee.org/document/10121303",
                   "abstract": "Cyber threat intelligence enables proactive security measures, but extracting IOCs manually is time-consuming. This paper introduces SecNLP, an ensemble transformer model designed to read unstructured security reports and output machine-readable STIX JSON objects with 97.8% F1-score. We discuss deployment scopes and dataset challenges for enterprise servers.",
                   "score": 91.0,
                   "difficulty": "Easy",
