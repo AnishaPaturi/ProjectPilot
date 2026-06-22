@@ -2,9 +2,11 @@ package com.projectpilot.backend.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.projectpilot.backend.entity.AvoidProject;
 import com.projectpilot.backend.entity.RecommendedPaper;
 import com.projectpilot.backend.entity.StudentPreferences;
 import com.projectpilot.backend.entity.User;
+import com.projectpilot.backend.repository.AvoidProjectRepository;
 import com.projectpilot.backend.repository.RecommendedPaperRepository;
 import com.projectpilot.backend.repository.StudentPreferencesRepository;
 import com.projectpilot.backend.repository.UserRepository;
@@ -23,16 +25,19 @@ public class RecommendationService {
     private final UserRepository userRepository;
     private final StudentPreferencesRepository preferencesRepository;
     private final RecommendedPaperRepository recommendedPaperRepository;
+    private final AvoidProjectRepository avoidProjectRepository;
     private final GeminiService geminiService;
     private final ObjectMapper objectMapper;
 
     public RecommendationService(UserRepository userRepository,
                                  StudentPreferencesRepository preferencesRepository,
                                  RecommendedPaperRepository recommendedPaperRepository,
+                                 AvoidProjectRepository avoidProjectRepository,
                                  GeminiService geminiService) {
         this.userRepository = userRepository;
         this.preferencesRepository = preferencesRepository;
         this.recommendedPaperRepository = recommendedPaperRepository;
+        this.avoidProjectRepository = avoidProjectRepository;
         this.geminiService = geminiService;
         this.objectMapper = new ObjectMapper();
     }
