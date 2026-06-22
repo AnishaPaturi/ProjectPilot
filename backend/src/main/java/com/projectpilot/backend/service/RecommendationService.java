@@ -129,7 +129,7 @@ public class RecommendationService {
                             .year(yearVal)
                             .journal(journal)
                             .doi((String) paperMap.get("doi"))
-                            .link((String) paperMap.get("link"))
+                            .link(getDirectDownloadUrl((String) paperMap.get("link"), (String) paperMap.get("doi")))
                             .abstractText((String) paperMap.get("abstract"))
                             .score(scoreVal)
                             .implementationPlan(planJsonString)
@@ -169,5 +169,26 @@ public class RecommendationService {
     @Transactional(readOnly = true)
     public List<RecommendedPaper> getSavedRecommendations(Long userId) {
         return recommendedPaperRepository.findByUserId(userId);
+    }
+
+    private String getDirectDownloadUrl(String link, String doi) {
+        // 1. Try Sci-Hub for free immediate full-text PDF access using DOI
+        if (doi != null && !doi.trim().isEmpty() && !doi.toLowerCase().contains("N/A")) {
+            return "https://sci-hub.se/" + doi.trim();
+        }
+
+        // 2. Try converting abstract IEEE Xplore link to stamp PDF viewer link
+        if (link != null && link.contains("ieeexplore.ieee.org/document/")) {
+            String[] parts = link.split("/document/");
+            if (parts.length > 1) {
+                String arnumber = parts[1].replaceAll("[^0-9]", "");
+                if (!arnumber.isEmpty()) {
+                    return "https://ieeexplore.ieee.org/stampPDF/getPDF.jsp?tp=&arnumber=" + arnumber;
+                }
+            }
+        }
+
+        // 3. Fallback to standard link
+        return (link != null && !link.trim().isEmpty()) ? link : "#";
     }
 }

@@ -53,15 +53,8 @@ public class PdfService {
             metaTable.setWidths(new float[]{1.5f, 5.5f});
             metaTable.setSpacingAfter(15);
 
-            // Paper Title (Hyperlink to download/view)
-            String paperUrl = paper.getLink();
-            if (paperUrl == null || paperUrl.trim().isEmpty()) {
-                if (paper.getDoi() != null && !paper.getDoi().trim().isEmpty()) {
-                    paperUrl = "https://doi.org/" + paper.getDoi();
-                } else {
-                    paperUrl = "#";
-                }
-            }
+            // Paper Title (Hyperlink to direct PDF download)
+            String paperUrl = getDirectDownloadUrl(paper);
 
             PdfPCell titleLabelCell = new PdfPCell(new Phrase("Paper Title:", bodyBoldFont));
             titleLabelCell.setBorder(Rectangle.NO_BORDER);
@@ -202,5 +195,29 @@ public class PdfService {
 
         table.addCell(labelCell);
         table.addCell(valueCell);
+    }
+
+    private String getDirectDownloadUrl(RecommendedPaper paper) {
+        String doi = paper.getDoi();
+        String link = paper.getLink();
+
+        // 1. Try Sci-Hub for free immediate full-text PDF access using DOI
+        if (doi != null && !doi.trim().isEmpty() && !doi.toLowerCase().contains("N/A")) {
+            return "https://sci-hub.se/" + doi.trim();
+        }
+
+        // 2. Try converting abstract IEEE Xplore link to stamp PDF viewer link
+        if (link != null && link.contains("ieeexplore.ieee.org/document/")) {
+            String[] parts = link.split("/document/");
+            if (parts.length > 1) {
+                String arnumber = parts[1].replaceAll("[^0-9]", "");
+                if (!arnumber.isEmpty()) {
+                    return "https://ieeexplore.ieee.org/stampPDF/getPDF.jsp?tp=&arnumber=" + arnumber;
+                }
+            }
+        }
+
+        // 3. Fallback to standard link
+        return (link != null && !link.trim().isEmpty()) ? link : "#";
     }
 }
