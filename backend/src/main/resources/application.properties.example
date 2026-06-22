@@ -3,10 +3,13 @@ spring.application.name=backend
 # Datasource Configuration
 spring.datasource.url=jdbc:mysql://localhost:3306/projectpilot?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
 spring.datasource.username=root
-spring.datasource.password=Arush_09
+spring.datasource.password=YOUR_DATABASE_PASSWORD
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 # JPA and Hibernate Configuration
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+# Gemini API Key
+gemini.api.key=YOUR_GEMINI_API_KEY

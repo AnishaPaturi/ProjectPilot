@@ -1,0 +1,20 @@
+# IDEs and Editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Subproject ignores (also handled in their respective directories)
+backend/target/
+frontend/dist/
+frontend/node_modules/
+
+# Local sensitive configuration files
+backend/src/main/resources/application.properties
