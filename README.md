@@ -83,7 +83,6 @@ graph TD
     Frontend -->|7. Generate Recommendations| Backend
     Backend -->|8. Retrieve Avoid List| DB[(MySQL Database)]
     Backend -->|9. Run Multi-Agent Prompts| LLM
-    Note over LLM: Paper Search -> Verification -> Similarity Check -> Project Planning
     LLM -->|10. Validated Recommendations JSON| Backend
     Backend -->|11. Exclude Conferences & Save| DB
     Backend -->|12. Return Recommendations| Frontend
