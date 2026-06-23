@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { recommendationsAPI } from '../services/api';
-import { Sparkles, FileText, Download, ChevronDown, ChevronUp, ArrowRight, Layers, Cpu, Award, Brain, Shield, Link as LinkIcon, Cloud, Network, AlertCircle, X, Database, Code, Eye, Monitor, Smartphone, Activity, Terminal } from 'lucide-react';
+import { Sparkles, FileText, Download, ChevronDown, ChevronUp, ArrowRight, Layers, Cpu, Award, Brain, Shield, Link as LinkIcon, Cloud, Network, AlertCircle, X, Database, Code, Eye, Monitor, Smartphone, Activity, Terminal, Users, Compass } from 'lucide-react';
 
 export default function Dashboard({ userId }) {
   const [papers, setPapers] = useState([]);
@@ -24,44 +24,55 @@ export default function Dashboard({ userId }) {
   const getDomainStyle = (index, name) => {
     const lower = name.toLowerCase();
     const config = [
-      { icon: <Brain size={24} className="text-pink-400" />, color: 'hover:border-pink-500/40 hover:bg-pink-500/5' },
-      { icon: <Shield size={24} className="text-emerald-400" />, color: 'hover:border-emerald-500/40 hover:bg-emerald-500/5' },
-      { icon: <LinkIcon size={24} className="text-amber-400" />, color: 'hover:border-amber-500/40 hover:bg-amber-500/5' },
-      { icon: <Cloud size={24} className="text-sky-400" />, color: 'hover:border-sky-500/40 hover:bg-sky-500/5' },
-      { icon: <Cpu size={24} className="text-indigo-400" />, color: 'hover:border-indigo-500/40 hover:bg-indigo-500/5' },
-      { icon: <Database size={24} className="text-rose-400" />, color: 'hover:border-rose-500/40 hover:bg-rose-500/5' },
-      { icon: <Code size={24} className="text-teal-400" />, color: 'hover:border-teal-500/40 hover:bg-teal-500/5' },
-      { icon: <Eye size={24} className="text-purple-400" />, color: 'hover:border-purple-500/40 hover:bg-purple-500/5' },
-      { icon: <Monitor size={24} className="text-cyan-400" />, color: 'hover:border-cyan-500/40 hover:bg-cyan-500/5' },
-      { icon: <Smartphone size={24} className="text-orange-400" />, color: 'hover:border-orange-500/40 hover:bg-orange-500/5' },
-      { icon: <Activity size={24} className="text-lime-400" />, color: 'hover:border-lime-500/40 hover:bg-lime-500/5' },
-      { icon: <Terminal size={24} className="text-violet-400" />, color: 'hover:border-violet-500/40 hover:bg-violet-500/5' }
+      { icon: <Activity size={24} className="text-lime-400" />, color: 'hover:border-lime-500/40 hover:bg-lime-500/5' },       // 0: Healthcare
+      { icon: <Award size={24} className="text-pink-400" />, color: 'hover:border-pink-500/40 hover:bg-pink-500/5' },         // 1: Education
+      { icon: <Users size={24} className="text-rose-400" />, color: 'hover:border-rose-500/40 hover:bg-rose-500/5' },         // 2: Career
+      { icon: <LinkIcon size={24} className="text-amber-400" />, color: 'hover:border-amber-500/40 hover:bg-amber-500/5' },   // 3: Finance
+      { icon: <Layers size={24} className="text-purple-400" />, color: 'hover:border-purple-500/40 hover:bg-purple-500/5' },   // 4: Stock Market
+      { icon: <Monitor size={24} className="text-cyan-400" />, color: 'hover:border-cyan-500/40 hover:bg-cyan-500/5' },       // 5: Real Estate
+      { icon: <Cloud size={24} className="text-sky-400" />, color: 'hover:border-sky-500/40 hover:bg-sky-500/5' },           // 6: Agriculture
+      { icon: <Shield size={24} className="text-emerald-400" />, color: 'hover:border-emerald-500/40 hover:bg-emerald-500/5' }, // 7: Cybersecurity
+      { icon: <Cpu size={24} className="text-indigo-400" />, color: 'hover:border-indigo-500/40 hover:bg-indigo-500/5' },       // 8: Logistics
+      { icon: <Sparkles size={24} className="text-teal-400" />, color: 'hover:border-teal-500/40 hover:bg-teal-500/5' },       // 9: Environment
+      { icon: <Users size={24} className="text-rose-400" />, color: 'hover:border-rose-500/40 hover:bg-rose-500/5' },         // 10: HR
+      { icon: <Compass size={24} className="text-indigo-400" />, color: 'hover:border-indigo-500/40 hover:bg-indigo-500/5' },   // 11: Travel
+      { icon: <FileText size={24} className="text-violet-400" />, color: 'hover:border-violet-500/40 hover:bg-violet-500/5' }, // 12: Gov Services
+      { icon: <Brain size={24} className="text-pink-400" />, color: 'hover:border-pink-500/40 hover:bg-pink-500/5' },         // 13: Sports
+      { icon: <Shield size={24} className="text-teal-400" />, color: 'hover:border-teal-500/40 hover:bg-teal-500/5' }          // 14: Insurance
     ];
 
-    if (lower.includes("security") || lower.includes("crypt")) {
+    if (lower.includes("health") || lower.includes("medic")) {
+      return config[0];
+    } else if (lower.includes("educat") || lower.includes("school") || lower.includes("learn")) {
       return config[1];
-    } else if (lower.includes("block") || lower.includes("ledger")) {
+    } else if (lower.includes("career") || lower.includes("job")) {
       return config[2];
-    } else if (lower.includes("cloud") || lower.includes("distrib")) {
+    } else if (lower.includes("finance") || lower.includes("bank")) {
       return config[3];
-    } else if (lower.includes("iot") || lower.includes("hardware") || lower.includes("sensor")) {
+    } else if (lower.includes("stock") || lower.includes("market") || lower.includes("trade")) {
       return config[4];
-    } else if (lower.includes("data") || lower.includes("analy") || lower.includes("databas")) {
+    } else if (lower.includes("estate") || lower.includes("interior") || lower.includes("design")) {
       return config[5];
-    } else if (lower.includes("software") || lower.includes("prog") || lower.includes("code")) {
+    } else if (lower.includes("agri") || lower.includes("farm") || lower.includes("crop")) {
       return config[6];
-    } else if (lower.includes("vision") || lower.includes("image")) {
+    } else if (lower.includes("cyber") || lower.includes("security") || lower.includes("threat")) {
       return config[7];
-    } else if (lower.includes("game") || lower.includes("vr") || lower.includes("graphics") || lower.includes("render")) {
+    } else if (lower.includes("logistics") || lower.includes("supply") || lower.includes("route")) {
       return config[8];
-    } else if (lower.includes("web") || lower.includes("mobile") || lower.includes("app")) {
+    } else if (lower.includes("environ") || lower.includes("sustain") || lower.includes("climate")) {
       return config[9];
-    } else if (lower.includes("bio") || lower.includes("health") || lower.includes("medical")) {
+    } else if (lower.includes("hr ") || lower.includes("hr &") || lower.includes("recruitment")) {
       return config[10];
-    } else if (lower.includes("quantum") || lower.includes("algorithm")) {
+    } else if (lower.includes("travel") || lower.includes("tourism") || lower.includes("hotel")) {
       return config[11];
+    } else if (lower.includes("gov") || lower.includes("citizen") || lower.includes("public")) {
+      return config[12];
+    } else if (lower.includes("sports") || lower.includes("game") || lower.includes("athlete")) {
+      return config[13];
+    } else if (lower.includes("insur") || lower.includes("claim")) {
+      return config[14];
     }
-    
+
     return config[index % config.length];
   };
 

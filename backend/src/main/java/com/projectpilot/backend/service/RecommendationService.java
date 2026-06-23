@@ -150,26 +150,21 @@ public class RecommendationService {
     public String suggestBroadDomains() {
         return "{\n" +
             "  \"domains\": [\n" +
-            "    { \"name\": \"Artificial Intelligence & Machine Learning\", \"description\": \"Neural Networks, Deep Learning, Generative Models, and Predictive Analytics.\" },\n" +
-            "    { \"name\": \"Cybersecurity & Cryptography\", \"description\": \"Network Defense, Threat Detection, Zero-Trust Architecture, and Cryptographic Protocols.\" },\n" +
-            "    { \"name\": \"Software Engineering & Systems\", \"description\": \"Software Architecture, Design Patterns, DevOps pipelines, and System Scalability.\" },\n" +
-            "    { \"name\": \"Cloud Computing & Virtualization\", \"description\": \"Serverless Compute, Container Orchestration (Kubernetes), and Microservices.\" },\n" +
-            "    { \"name\": \"Internet of Things (IoT) & Smart Systems\", \"description\": \"Sensor Networks, Smart Cities, Cyber-Physical Systems, and Edge Computing.\" },\n" +
-            "    { \"name\": \"Data Science & Big Data Analytics\", \"description\": \"Data Warehousing, ETL pipelines, Stream Processing, and Visual Analytics.\" },\n" +
-            "    { \"name\": \"Blockchain & Distributed Ledger\", \"description\": \"Smart Contracts, Decentralized Apps (dApps), DeFi, and Consensus Algorithms.\" },\n" +
-            "    { \"name\": \"Computer Vision & Image Processing\", \"description\": \"Object Detection, Image Segmentation, Facial Recognition, and Video Analysis.\" },\n" +
-            "    { \"name\": \"Natural Language Processing (NLP)\", \"description\": \"Text Mining, Sentiment Analysis, Translation, and Large Language Models.\" },\n" +
-            "    { \"name\": \"AR/VR & Computer Graphics\", \"description\": \"3D Rendering, Virtual Environments, Physics Engines, and Interactive Simulation.\" },\n" +
-            "    { \"name\": \"Mobile & Web Application Architectures\", \"description\": \"Progressive Web Apps, Mobile Frameworks, and High-Performance APIs.\" },\n" +
-            "    { \"name\": \"Bioinformatics & Computational Biology\", \"description\": \"Genomic Sequencing, Protein Structure Folding, and Medical Modeling.\" },\n" +
-            "    { \"name\": \"Quantum Computing & Algorithms\", \"description\": \"Qubits, Quantum Gates, Cryptographic Resilience, and Quantum Simulation.\" },\n" +
-            "    { \"name\": \"Robotics & Autonomous Systems\", \"description\": \"Robotic Control, Autonomous Navigation, Drones, and Sensor Fusion.\" },\n" +
-            "    { \"name\": \"Database Systems & Data Mining\", \"description\": \"SQL/NoSQL Architectures, Indexing Optimizations, and Knowledge Discovery.\" },\n" +
-            "    { \"name\": \"Computer Networks & Communication\", \"description\": \"Protocol Design, SDN (Software Defined Networking), and Wireless Communication.\" },\n" +
-            "    { \"name\": \"Operating Systems & Systems Programming\", \"description\": \"Kernel Development, File Systems, Virtualization, and Device Drivers.\" },\n" +
-            "    { \"name\": \"Human-Computer Interaction (HCI)\", \"description\": \"UI/UX Design Systems, Usability Engineering, and Interactive Devices.\" },\n" +
-            "    { \"name\": \"Theoretical Computer Science\", \"description\": \"Formal Verification, Automata Theory, Complexity Theory, and Cryptographic Proofs.\" },\n" +
-            "    { \"name\": \"Distributed Systems & Parallel Computing\", \"description\": \"High-Performance Computing, Consensus Protocols (Paxos, Raft), and Grid Computing.\" }\n" +
+            "    { \"name\": \"Healthcare\", \"description\": \"Medical imaging, disease prediction, patient monitoring, and telemedicine systems.\" },\n" +
+            "    { \"name\": \"Education\", \"description\": \"Intelligent tutoring, personalized learning paths, and academic performance analytics.\" },\n" +
+            "    { \"name\": \"Career & Recruitment\", \"description\": \"Automated resume screening, candidate matchmaking, and job market trend modeling.\" },\n" +
+            "    { \"name\": \"Finance\", \"description\": \"Algorithmic trading, credit risk assessment, and decentralized banking applications.\" },\n" +
+            "    { \"name\": \"Stock Market\", \"description\": \"Time-series forecasting, market sentiment analysis, and portfolio optimization.\" },\n" +
+            "    { \"name\": \"Real Estate & Interior Design\", \"description\": \"Property valuation models, virtual home staging, and floor plan generation.\" },\n" +
+            "    { \"name\": \"Agriculture\", \"description\": \"Precision farming, crop disease detection via vision models, and smart irrigation.\" },\n" +
+            "    { \"name\": \"Cybersecurity\", \"description\": \"Intrusion detection, malware analysis, zero-trust systems, and threat intelligence.\" },\n" +
+            "    { \"name\": \"Logistics\", \"description\": \"Route optimization, supply chain tracking, inventory management, and fleet automation.\" },\n" +
+            "    { \"name\": \"Environment & Sustainability\", \"description\": \"Carbon footprint tracking, climate modeling, and smart energy grid management.\" },\n" +
+            "    { \"name\": \"HR & Recruitment\", \"description\": \"Workforce analytics, employee turnover prediction, and talent acquisition models.\" },\n" +
+            "    { \"name\": \"Travel & Tourism\", \"description\": \"Dynamic price recommendation, travel itinerary planners, and hospitality management.\" },\n" +
+            "    { \"name\": \"Government Services\", \"description\": \"E-governance portals, public service tracking, and automated citizen feedback systems.\" },\n" +
+            "    { \"name\": \"Sports Analytics\", \"description\": \"Player performance modeling, strategy optimization, and injury risk forecasting.\" },\n" +
+            "    { \"name\": \"Insurance\", \"description\": \"Claim automation, fraud detection in underwriting, and risk premium calculations.\" }\n" +
             "  ]\n" +
             "}";
     }
