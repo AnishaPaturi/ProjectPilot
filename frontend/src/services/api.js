@@ -20,6 +20,7 @@ export const preferencesAPI = {
 };
 
 export const recommendationsAPI = {
+  suggestDomains: () => api.get('/recommendations/suggest-domains'),
   suggestSubdomains: (domain) => api.post('/recommendations/suggest-subdomains', { domain }),
   generate: (userId, subdomain) => api.post(`/recommendations/generate/${userId}`, { subdomain }),
   getSaved: (userId) => api.get(`/recommendations/saved/${userId}`),

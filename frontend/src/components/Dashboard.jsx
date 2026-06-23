@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { recommendationsAPI } from '../services/api';
-import { Sparkles, FileText, Download, ChevronDown, ChevronUp, ArrowRight, Layers, Cpu, Award, Brain, Shield, Link as LinkIcon, Cloud, Network, AlertCircle, X } from 'lucide-react';
+import { Sparkles, FileText, Download, ChevronDown, ChevronUp, ArrowRight, Layers, Cpu, Award, Brain, Shield, Link as LinkIcon, Cloud, Network, AlertCircle, X, Database, Code, Eye, Monitor, Smartphone, Activity, Terminal } from 'lucide-react';
 
 export default function Dashboard({ userId }) {
   const [papers, setPapers] = useState([]);
@@ -15,45 +15,54 @@ export default function Dashboard({ userId }) {
   const [selectedBroadDomain, setSelectedBroadDomain] = useState('');
   const [subdomains, setSubdomains] = useState([]);
   const [selectedSubdomain, setSelectedSubdomain] = useState('');
+  const [customDomain, setCustomDomain] = useState('');
+  const [domains, setDomains] = useState([]);
+  const [domainsLoading, setDomainsLoading] = useState(false);
 
-  // Pre-defined CSE Broad Domains suggested by the agent
-  const agentSuggestedDomains = [
-    {
-      id: 'ai-ml',
-      name: 'Artificial Intelligence & Machine Learning',
-      description: 'Computer Vision, Natural Language Processing, Neural Networks, and Predictive Analytics.',
-      icon: <Brain size={24} className="text-pink-400" />,
-      colorClass: 'hover:border-pink-500/40 hover:bg-pink-500/5'
-    },
-    {
-      id: 'cybersecurity',
-      name: 'Cybersecurity & Cryptography',
-      description: 'Network Defense, Intrusion Detection, Malware Analysis, and Zero-Knowledge Proofs.',
-      icon: <Shield size={24} className="text-emerald-400" />,
-      colorClass: 'hover:border-emerald-500/40 hover:bg-emerald-500/5'
-    },
-    {
-      id: 'blockchain',
-      name: 'Blockchain & Distributed Ledger',
-      description: 'Smart Contracts, Decentralized Apps (dApps), Consensuses, and Smart Ledger security.',
-      icon: <LinkIcon size={24} className="text-amber-400" />,
-      colorClass: 'hover:border-amber-500/40 hover:bg-amber-500/5'
-    },
-    {
-      id: 'cloud',
-      name: 'Cloud Computing & Virtualization',
-      description: 'Serverless Architectures, Container Orchestration, Edge Nodes, and Distributed Systems.',
-      icon: <Cloud size={24} className="text-sky-400" />,
-      colorClass: 'hover:border-sky-500/40 hover:bg-sky-500/5'
-    },
-    {
-      id: 'iot',
-      name: 'Internet of Things & Smart Systems',
-      description: 'Cyber-Physical Systems, Sensor networks, Smart Cities, and Edge AI nodes.',
-      icon: <Cpu size={24} className="text-indigo-400" />,
-      colorClass: 'hover:border-indigo-500/40 hover:bg-indigo-500/5'
+  // Preset list of design configurations to cycle through or match for dynamic domains
+  const getDomainStyle = (index, name) => {
+    const lower = name.toLowerCase();
+    const config = [
+      { icon: <Brain size={24} className="text-pink-400" />, color: 'hover:border-pink-500/40 hover:bg-pink-500/5' },
+      { icon: <Shield size={24} className="text-emerald-400" />, color: 'hover:border-emerald-500/40 hover:bg-emerald-500/5' },
+      { icon: <LinkIcon size={24} className="text-amber-400" />, color: 'hover:border-amber-500/40 hover:bg-amber-500/5' },
+      { icon: <Cloud size={24} className="text-sky-400" />, color: 'hover:border-sky-500/40 hover:bg-sky-500/5' },
+      { icon: <Cpu size={24} className="text-indigo-400" />, color: 'hover:border-indigo-500/40 hover:bg-indigo-500/5' },
+      { icon: <Database size={24} className="text-rose-400" />, color: 'hover:border-rose-500/40 hover:bg-rose-500/5' },
+      { icon: <Code size={24} className="text-teal-400" />, color: 'hover:border-teal-500/40 hover:bg-teal-500/5' },
+      { icon: <Eye size={24} className="text-purple-400" />, color: 'hover:border-purple-500/40 hover:bg-purple-500/5' },
+      { icon: <Monitor size={24} className="text-cyan-400" />, color: 'hover:border-cyan-500/40 hover:bg-cyan-500/5' },
+      { icon: <Smartphone size={24} className="text-orange-400" />, color: 'hover:border-orange-500/40 hover:bg-orange-500/5' },
+      { icon: <Activity size={24} className="text-lime-400" />, color: 'hover:border-lime-500/40 hover:bg-lime-500/5' },
+      { icon: <Terminal size={24} className="text-violet-400" />, color: 'hover:border-violet-500/40 hover:bg-violet-500/5' }
+    ];
+
+    if (lower.includes("security") || lower.includes("crypt")) {
+      return config[1];
+    } else if (lower.includes("block") || lower.includes("ledger")) {
+      return config[2];
+    } else if (lower.includes("cloud") || lower.includes("distrib")) {
+      return config[3];
+    } else if (lower.includes("iot") || lower.includes("hardware") || lower.includes("sensor")) {
+      return config[4];
+    } else if (lower.includes("data") || lower.includes("analy") || lower.includes("databas")) {
+      return config[5];
+    } else if (lower.includes("software") || lower.includes("prog") || lower.includes("code")) {
+      return config[6];
+    } else if (lower.includes("vision") || lower.includes("image")) {
+      return config[7];
+    } else if (lower.includes("game") || lower.includes("vr") || lower.includes("graphics") || lower.includes("render")) {
+      return config[8];
+    } else if (lower.includes("web") || lower.includes("mobile") || lower.includes("app")) {
+      return config[9];
+    } else if (lower.includes("bio") || lower.includes("health") || lower.includes("medical")) {
+      return config[10];
+    } else if (lower.includes("quantum") || lower.includes("algorithm")) {
+      return config[11];
     }
-  ];
+    
+    return config[index % config.length];
+  };
 
   const fetchSavedRecommendations = async () => {
     try {
@@ -70,12 +79,24 @@ export default function Dashboard({ userId }) {
     fetchSavedRecommendations();
   }, [userId]);
 
-  const handleStartWizard = () => {
+  const handleStartWizard = async () => {
     setSelectedBroadDomain('');
     setSubdomains([]);
     setSelectedSubdomain('');
+    setCustomDomain('');
     setError('');
     setWizardStep('select-broad-domain');
+    setDomainsLoading(true);
+    try {
+      const response = await recommendationsAPI.suggestDomains();
+      const list = response.data?.domains || [];
+      setDomains(list);
+    } catch (err) {
+      console.error('Failed to auto-generate domains:', err);
+      setError('Failed to auto-generate trending domains. You can still type a custom domain below.');
+    } finally {
+      setDomainsLoading(false);
+    }
   };
 
   const handleSelectBroadDomain = async (domainName) => {
@@ -166,36 +187,77 @@ export default function Dashboard({ userId }) {
             </button>
           </div>
 
-          {loading ? (
+          {domainsLoading ? (
+            <div className="glass-panel rounded-2xl p-12 text-center flex flex-col items-center justify-center space-y-4">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500"></div>
+              <p className="text-slate-400 text-sm">AI is dynamically auto-generating trending research domains...</p>
+            </div>
+          ) : loading ? (
             <div className="glass-panel rounded-2xl p-12 text-center flex flex-col items-center justify-center space-y-4">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500"></div>
               <p className="text-slate-400 text-sm">Analyzing domain & requesting subdomains...</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {agentSuggestedDomains.map((dom) => (
-                <div
-                  key={dom.id}
-                  onClick={() => handleSelectBroadDomain(dom.name)}
-                  className={`glass-panel rounded-2xl p-6 border border-slate-900 transition-all cursor-pointer space-y-4 flex flex-col justify-between group ${dom.colorClass}`}
-                >
-                  <div className="space-y-2">
-                    <div className="p-3 bg-slate-900/80 rounded-xl w-fit group-hover:scale-110 transition-transform">
-                      {dom.icon}
-                    </div>
-                    <h3 className="font-bold text-slate-200 group-hover:text-indigo-300 transition-colors text-base pt-2">
-                      {dom.name}
-                    </h3>
-                    <p className="text-slate-500 text-xs leading-relaxed">
-                      {dom.description}
-                    </p>
-                  </div>
-                  <div className="text-indigo-400 text-xs font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform self-end">
+            <div className="space-y-6">
+              {/* Custom Domain Input */}
+              <div className="glass-panel rounded-2xl p-6 border border-slate-900 bg-slate-950/20 shadow-xl space-y-3">
+                <h3 className="text-slate-300 text-sm font-semibold">Or Type a Custom Research Domain</h3>
+                <p className="text-slate-500 text-xs">
+                  If your area of interest is not listed below, type any custom domain to dynamically generate subdomains.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="text"
+                    value={customDomain}
+                    onChange={(e) => setCustomDomain(e.target.value)}
+                    placeholder="e.g. Distributed Databases, Human-Computer Interaction, Autonomous Robotics..."
+                    className="flex-1 bg-slate-950/80 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl py-3 px-4 text-slate-100 placeholder-slate-700 outline-none transition-all text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (customDomain.trim()) {
+                        handleSelectBroadDomain(customDomain.trim());
+                      }
+                    }}
+                    disabled={!customDomain.trim()}
+                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer text-sm disabled:opacity-50 h-11"
+                  >
                     <span>Explore Subdomains</span>
-                    <ArrowRight size={12} />
-                  </div>
+                    <ArrowRight size={16} />
+                  </button>
                 </div>
-              ))}
+              </div>
+
+              {/* Grid of Auto-Generated Domains */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {domains.map((dom, index) => {
+                  const style = getDomainStyle(index, dom.name);
+                  return (
+                    <div
+                      key={index}
+                      onClick={() => handleSelectBroadDomain(dom.name)}
+                      className={`glass-panel rounded-2xl p-6 border border-slate-900 transition-all cursor-pointer space-y-4 flex flex-col justify-between group ${style.color}`}
+                    >
+                      <div className="space-y-2">
+                        <div className="p-3 bg-slate-900/80 rounded-xl w-fit group-hover:scale-110 transition-transform">
+                          {style.icon}
+                        </div>
+                        <h3 className="font-bold text-slate-200 group-hover:text-indigo-300 transition-colors text-base pt-2">
+                          {dom.name}
+                        </h3>
+                        <p className="text-slate-500 text-xs leading-relaxed">
+                          {dom.description}
+                        </p>
+                      </div>
+                      <div className="text-indigo-400 text-xs font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform self-end">
+                        <span>Explore Subdomains</span>
+                        <ArrowRight size={12} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

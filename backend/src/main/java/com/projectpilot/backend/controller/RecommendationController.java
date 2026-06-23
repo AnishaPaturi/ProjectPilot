@@ -29,6 +29,18 @@ public class RecommendationController {
         this.pdfService = pdfService;
     }
 
+    @GetMapping("/suggest-domains")
+    public ResponseEntity<?> suggestBroadDomains() {
+        try {
+            String resultJson = recommendationService.suggestBroadDomains();
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(resultJson);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/suggest-subdomains")
     public ResponseEntity<?> suggestSubdomains(@RequestBody Map<String, String> request) {
         try {

@@ -147,6 +147,23 @@ public class RecommendationService {
     }
 
     @Transactional
+    public String suggestBroadDomains() {
+        String prompt = "You are a Computer Science Research Director. Generate a list of 6 trending, cutting-edge broad research domains in Computer Science (e.g. Artificial Intelligence & Machine Learning, Cybersecurity & Cryptography, Cloud Computing, Blockchain, IoT, etc.) that would make strong final-year major projects.\n" +
+            "Return the output in a strict JSON format matching the following schema:\n" +
+            "{\n" +
+            "  \"domains\": [\n" +
+            "    {\n" +
+            "      \"name\": \"Domain Name\",\n" +
+            "      \"description\": \"Brief 1-sentence description of the domain's relevance and scope\"\n" +
+            "    }\n" +
+            "  ]\n" +
+            "}\n\n" +
+            "Make sure the response contains ONLY valid JSON and nothing else.";
+
+        return geminiService.generateContent(prompt, true);
+    }
+
+    @Transactional
     public String suggestSubdomains(String domain) {
         String prompt = String.format(
             "You are a Research Domain Analyzer. Given a broad domain of interest: '%s', suggest 4 specific, relevant, and cutting-edge final-year CSE project subdomains.\n" +
