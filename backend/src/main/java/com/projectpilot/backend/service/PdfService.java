@@ -73,7 +73,20 @@ public class PdfService {
 
             addMetaRow(metaTable, "Authors:", paper.getAuthors(), bodyBoldFont, bodyFont);
             addMetaRow(metaTable, "Journal:", paper.getJournal() + " (" + paper.getYear() + ")", bodyBoldFont, bodyFont);
-            addMetaRow(metaTable, "DOI / Link:", paper.getDoi(), bodyBoldFont, bodyFont);
+
+            PdfPCell doiLabelCell = new PdfPCell(new Phrase("DOI / Link:", bodyBoldFont));
+            doiLabelCell.setBorder(Rectangle.NO_BORDER);
+            doiLabelCell.setPadding(4);
+
+            Anchor doiAnchor = new Anchor(paper.getDoi() != null && !paper.getDoi().trim().isEmpty() ? paper.getDoi() : paperUrl, titleLinkFont);
+            doiAnchor.setReference(paperUrl);
+
+            PdfPCell doiValueCell = new PdfPCell(doiAnchor);
+            doiValueCell.setBorder(Rectangle.NO_BORDER);
+            doiValueCell.setPadding(4);
+
+            metaTable.addCell(doiLabelCell);
+            metaTable.addCell(doiValueCell);
 
             document.add(metaTable);
 

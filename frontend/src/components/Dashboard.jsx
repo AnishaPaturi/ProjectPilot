@@ -10,9 +10,11 @@ export default function Dashboard({ userId }) {
   const [expandedPaper, setExpandedPaper] = useState(null);
   const [activeTabs, setActiveTabs] = useState({}); // { paperId: 'roadmap' | 'modules' | 'details' }
 
-  // Step Wizard States: 'idle' | 'select-broad-domain' | 'select-subdomain' | 'generating'
+  // Step Wizard States: 'idle' | 'select-broad-domain' | 'select-project-area' | 'select-subdomain' | 'generating'
   const [wizardStep, setWizardStep] = useState('idle');
   const [selectedBroadDomain, setSelectedBroadDomain] = useState('');
+  const [selectedDomainObj, setSelectedDomainObj] = useState(null);
+  const [selectedProjectArea, setSelectedProjectArea] = useState('');
   const [subdomains, setSubdomains] = useState([]);
   const [selectedSubdomain, setSelectedSubdomain] = useState('');
   const [customDomain, setCustomDomain] = useState('');
@@ -93,6 +95,8 @@ export default function Dashboard({ userId }) {
 
   const handleStartWizard = async () => {
     setSelectedBroadDomain('');
+    setSelectedDomainObj(null);
+    setSelectedProjectArea('');
     setSubdomains([]);
     setSelectedSubdomain('');
     setCustomDomain('');
@@ -112,12 +116,19 @@ export default function Dashboard({ userId }) {
     }
   };
 
-  const handleSelectBroadDomain = async (domainName) => {
-    setSelectedBroadDomain(domainName);
+  const handleSelectBroadDomain = (domainObj) => {
+    setSelectedDomainObj(domainObj);
+    setSelectedBroadDomain(domainObj.name);
+    setWizardStep('select-project-area');
+  };
+
+  const handleSelectCustomDomain = async (customName) => {
+    setSelectedBroadDomain(customName);
+    setSelectedProjectArea(customName);
     setLoading(true);
     setError('');
     try {
-      const response = await recommendationsAPI.suggestSubdomains(domainName);
+      const response = await recommendationsAPI.suggestSubdomains(customName);
       const data = response.data || {};
       const list = data.subdomains || [];
       if (list.length === 0) {
@@ -128,6 +139,28 @@ export default function Dashboard({ userId }) {
     } catch (err) {
       setError(err.response?.data || err.message || 'Failed to suggest subdomains.');
       setWizardStep('select-broad-domain');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectProjectArea = async (areaName) => {
+    setSelectedProjectArea(areaName);
+    setLoading(true);
+    setError('');
+    try {
+      const seedQuery = `${selectedBroadDomain} - ${areaName}`;
+      const response = await recommendationsAPI.suggestSubdomains(seedQuery);
+      const data = response.data || {};
+      const list = data.subdomains || [];
+      if (list.length === 0) {
+        throw new Error("No research subdomains were returned for this topic.");
+      }
+      setSubdomains(list);
+      setWizardStep('select-subdomain');
+    } catch (err) {
+      setError(err.response?.data || err.message || 'Failed to suggest subdomains.');
+      setWizardStep('select-project-area');
     } finally {
       setLoading(false);
     }
@@ -250,7 +283,7 @@ export default function Dashboard({ userId }) {
                     type="button"
                     onClick={() => {
                       if (customDomain.trim()) {
-                        handleSelectBroadDomain(customDomain.trim());
+                        handleSelectCustomDomain(customDomain.trim());
                       }
                     }}
                     disabled={!customDomain.trim()}
@@ -269,7 +302,7 @@ export default function Dashboard({ userId }) {
                   return (
                     <div
                       key={index}
-                      onClick={() => handleSelectBroadDomain(dom.name)}
+                      onClick={() => handleSelectBroadDomain(dom)}
                       className={`glass-panel rounded-2xl p-6 border border-slate-900 transition-all cursor-pointer space-y-4 flex flex-col justify-between group ${style.color}`}
                     >
                       <div className="space-y-2">
@@ -302,6 +335,96 @@ export default function Dashboard({ userId }) {
         </div>
       )}
 
+      {/* 1.5 Select Predefined Project Area Step */}
+      {wizardStep === 'select-project-area' && (
+        <div className="space-y-6 max-w-4xl mx-auto">
+          <div className="glass-panel rounded-2xl p-6 flex justify-between items-center border border-slate-900 shadow-xl relative">
+            <div>
+              <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+                <Layers className="text-indigo-400" size={22} />
+                Select Project Area
+              </h2>
+              <p className="text-slate-400 text-xs mt-1">
+                Choose a project area for <strong>{selectedBroadDomain}</strong> to seed cutting-edge research subdomains
+              </p>
+            </div>
+            <button 
+              onClick={() => setWizardStep('select-broad-domain')} 
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-semibold rounded-xl transition-all cursor-pointer border border-slate-800"
+            >
+              Go Back
+            </button>
+          </div>
+
+          {loading ? (
+            <div className="glass-panel rounded-2xl p-12 text-center flex flex-col items-center justify-center space-y-4">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500"></div>
+              <p className="text-slate-400 text-sm">AI is dynamically generating 4 cutting-edge subdomains for "{selectedProjectArea || 'selected project area'}"...</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Custom Project Area Input */}
+              <div className="glass-panel rounded-2xl p-6 border border-slate-900 bg-slate-950/20 shadow-xl space-y-3">
+                <h3 className="text-slate-300 text-sm font-semibold">Or Type a Custom Project Area</h3>
+                <p className="text-slate-500 text-xs">
+                  If your preferred topic is not listed, enter a custom project area for {selectedBroadDomain}.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="text"
+                    id="custom-project-area-input"
+                    placeholder="e.g. AI-driven Interior Lighting Optimization, Decentralized Title Verification..."
+                    className="flex-1 bg-slate-950/80 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl py-3 px-4 text-slate-100 placeholder-slate-700 outline-none transition-all text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const val = document.getElementById('custom-project-area-input')?.value;
+                      if (val && val.trim()) {
+                        handleSelectProjectArea(val.trim());
+                      }
+                    }}
+                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer text-sm h-11"
+                  >
+                    <span>Generate Subdomains</span>
+                    <ArrowRight size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Grid of Predefined Project Areas */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {selectedDomainObj?.projectAreas?.map((area, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => handleSelectProjectArea(area)}
+                    className="glass-panel rounded-2xl p-6 border border-slate-900 hover:border-indigo-500/40 hover:bg-indigo-500/5 transition-all cursor-pointer space-y-3 group flex flex-col justify-between"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="p-2 bg-slate-900 rounded-lg text-indigo-400 group-hover:scale-110 transition-transform">
+                          <Code size={18} />
+                        </span>
+                        <h3 className="font-bold text-slate-200 group-hover:text-indigo-300 transition-colors text-sm">
+                          {area}
+                        </h3>
+                      </div>
+                      <p className="text-slate-500 text-xs leading-relaxed">
+                        Explore cutting-edge {selectedBroadDomain} research papers and weekly project implementation roadmap focusing on {area.toLowerCase()}.
+                      </p>
+                    </div>
+                    <div className="text-indigo-400 text-xs font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform self-end">
+                      <span>Explore Subdomains</span>
+                      <ArrowRight size={12} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* 2. Select Subdomain Step */}
       {wizardStep === 'select-subdomain' && (
         <div className="space-y-6 max-w-3xl mx-auto">
@@ -311,10 +434,10 @@ export default function Dashboard({ userId }) {
                 <Layers className="text-indigo-400" size={20} />
                 Select Specific Subdomain
               </h2>
-              <p className="text-slate-400 text-xs mt-1">Subdomain options for: <strong>{selectedBroadDomain}</strong></p>
+              <p className="text-slate-400 text-xs mt-1">Subdomain options for: <strong>{selectedBroadDomain} - {selectedProjectArea}</strong></p>
             </div>
             <button
-              onClick={() => setWizardStep('select-broad-domain')}
+              onClick={() => setWizardStep('select-project-area')}
               className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-semibold rounded-xl transition-all cursor-pointer border border-slate-800"
             >
               Go Back

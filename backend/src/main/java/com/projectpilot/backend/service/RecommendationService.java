@@ -54,7 +54,8 @@ public class RecommendationService {
         // Construct the multi-agent pipeline prompt
         String prompt = String.format(
             "You are a Multi-Agent IEEE Paper Recommender and Project Planner System. Run the following workflow:\n" +
-            "1. Paper Search Agent: Retrieve 3 highly realistic, high-fidelity IEEE journal or transaction papers published in 2025 or 2026 specifically about the subdomain: '%s'.\n" +
+            "1. Paper Search Agent: Retrieve 3 highly realistic, high-fidelity IEEE journal or transaction papers published in 2025 or 2026 specifically about the subdomain: '%s'. " +
+            "Directly cross-reference this subdomain with high-demand, cutting-edge computer science subfields (such as Agentic AI, Multi-Agent Systems, Cybersecurity, Digital Forensics, Smart Energy, Industry 4.0, Digital Twins, Healthcare AI, Explainable AI (XAI), Edge AI, Federated Learning, and Reinforcement Learning). The recommended papers must show integration of these advanced CS subfields to be suitable for high-scoring CSE final-year projects.\n" +
             "2. Paper Verification Agent: Verify each paper. Ensure it is an IEEE Journal or Transaction paper (e.g. IEEE Transactions on Cloud Computing, IEEE Access, IEEE Journal of IoT). Ensure it is NOT a conference paper, survey paper, or review paper. It must have a valid-looking DOI and IEEE Xplore link. Conference papers, workshop papers, or symposium proceedings are STRICTLY PROHIBITED and must not be returned.\n" +
             "3. Similarity Agent: Filter out any papers that are similar or related to the following user avoid list: [%s]. If a paper is similar, replace it with a completely different topic.\n" +
             "4. Ranking Agent: Rate each paper out of 100 based on feasibility for a standard CSE final-year major project, implementation difficulty, innovation, and publication scope.\n" +
@@ -148,25 +149,475 @@ public class RecommendationService {
 
     @Transactional
     public String suggestBroadDomains() {
-        return "{\n" +
-            "  \"domains\": [\n" +
-            "    { \"name\": \"Healthcare\", \"description\": \"Medical imaging, disease prediction, patient monitoring, and telemedicine systems.\" },\n" +
-            "    { \"name\": \"Education\", \"description\": \"Intelligent tutoring, personalized learning paths, and academic performance analytics.\" },\n" +
-            "    { \"name\": \"Career & Recruitment\", \"description\": \"Automated resume screening, candidate matchmaking, and job market trend modeling.\" },\n" +
-            "    { \"name\": \"Finance\", \"description\": \"Algorithmic trading, credit risk assessment, and decentralized banking applications.\" },\n" +
-            "    { \"name\": \"Stock Market\", \"description\": \"Time-series forecasting, market sentiment analysis, and portfolio optimization.\" },\n" +
-            "    { \"name\": \"Real Estate & Interior Design\", \"description\": \"Property valuation models, virtual home staging, and floor plan generation.\" },\n" +
-            "    { \"name\": \"Agriculture\", \"description\": \"Precision farming, crop disease detection via vision models, and smart irrigation.\" },\n" +
-            "    { \"name\": \"Cybersecurity\", \"description\": \"Intrusion detection, malware analysis, zero-trust systems, and threat intelligence.\" },\n" +
-            "    { \"name\": \"Logistics\", \"description\": \"Route optimization, supply chain tracking, inventory management, and fleet automation.\" },\n" +
-            "    { \"name\": \"Environment & Sustainability\", \"description\": \"Carbon footprint tracking, climate modeling, and smart energy grid management.\" },\n" +
-            "    { \"name\": \"HR & Recruitment\", \"description\": \"Workforce analytics, employee turnover prediction, and talent acquisition models.\" },\n" +
-            "    { \"name\": \"Travel & Tourism\", \"description\": \"Dynamic price recommendation, travel itinerary planners, and hospitality management.\" },\n" +
-            "    { \"name\": \"Government Services\", \"description\": \"E-governance portals, public service tracking, and automated citizen feedback systems.\" },\n" +
-            "    { \"name\": \"Sports Analytics\", \"description\": \"Player performance modeling, strategy optimization, and injury risk forecasting.\" },\n" +
-            "    { \"name\": \"Insurance\", \"description\": \"Claim automation, fraud detection in underwriting, and risk premium calculations.\" }\n" +
-            "  ]\n" +
-            "}";
+        return """
+            {
+              "domains": [
+                {
+                  "name": "Healthcare",
+                  "description": "Improving medical services, diagnosis, patient care, and hospital management.",
+                  "projectAreas": [
+                    "Disease Prediction",
+                    "Medical Image Analysis",
+                    "AI Diagnostic Systems",
+                    "Electronic Health Records (EHR)",
+                    "Telemedicine",
+                    "Drug Recommendation Systems",
+                    "Mental Health Monitoring",
+                    "Wearable Health Devices",
+                    "Hospital Resource Management",
+                    "Personalized Medicine"
+                  ]
+                },
+                {
+                  "name": "Education",
+                  "description": "Enhancing learning experiences and academic management.",
+                  "projectAreas": [
+                    "Adaptive Learning Systems",
+                    "AI Tutors",
+                    "Student Performance Prediction",
+                    "Online Examination Systems",
+                    "Learning Analytics",
+                    "Attendance Automation",
+                    "Personalized Learning Paths",
+                    "Educational Chatbots",
+                    "Virtual Labs",
+                    "Academic Recommendation Systems"
+                  ]
+                },
+                {
+                  "name": "Career & Recruitment",
+                  "description": "Helping people find jobs and helping companies hire talent.",
+                  "projectAreas": [
+                    "Resume Screening",
+                    "Job Recommendation Engines",
+                    "Skill Gap Analysis",
+                    "Career Guidance Agents",
+                    "Interview Preparation Systems",
+                    "AI Recruiters",
+                    "Talent Matching Platforms",
+                    "Employee Assessment Tools",
+                    "Professional Networking Platforms",
+                    "Career Roadmap Generation"
+                  ]
+                },
+                {
+                  "name": "Finance",
+                  "description": "Banking, investments, loans, and financial decision-making.",
+                  "projectAreas": [
+                    "Loan Approval Prediction",
+                    "Credit Scoring",
+                    "Fraud Detection",
+                    "Expense Tracking",
+                    "Financial Planning Agents",
+                    "Budget Optimization",
+                    "Digital Banking",
+                    "FinTech Solutions",
+                    "Risk Analysis",
+                    "Cryptocurrency Analytics"
+                  ]
+                },
+                {
+                  "name": "Stock Market",
+                  "description": "Trading, investment analysis, and market prediction.",
+                  "projectAreas": [
+                    "Stock Price Prediction",
+                    "Portfolio Management",
+                    "Sentiment Analysis",
+                    "Trading Bots",
+                    "Investment Advisors",
+                    "Risk Assessment",
+                    "Market Trend Analysis",
+                    "News Impact Prediction",
+                    "Algorithmic Trading",
+                    "Financial Forecasting"
+                  ]
+                },
+                {
+                  "name": "Real Estate & Interior Design",
+                  "description": "Property management, architecture, and smart living. Fits Habitat AI concepts.",
+                  "projectAreas": [
+                    "Property Price Prediction",
+                    "Smart Home Systems",
+                    "Interior Design Recommendation",
+                    "Virtual Property Tours",
+                    "GIS-based Land Analysis",
+                    "Digital Twins",
+                    "Construction Planning",
+                    "Rental Recommendation Systems",
+                    "Property Fraud Detection",
+                    "Sustainable Architecture"
+                  ]
+                },
+                {
+                  "name": "Agriculture",
+                  "description": "Improving farming and food production.",
+                  "projectAreas": [
+                    "Crop Yield Prediction",
+                    "Smart Irrigation",
+                    "Pest Detection",
+                    "Soil Analysis",
+                    "Agricultural Drones",
+                    "Precision Farming",
+                    "Weather Prediction",
+                    "Farm Management Systems",
+                    "Livestock Monitoring",
+                    "Crop Disease Detection"
+                  ]
+                },
+                {
+                  "name": "Cybersecurity",
+                  "description": "Protecting systems, networks, and data.",
+                  "projectAreas": [
+                    "Intrusion Detection Systems",
+                    "Malware Analysis",
+                    "Phishing Detection",
+                    "Threat Intelligence",
+                    "Blockchain Security",
+                    "Zero Trust Security",
+                    "Vulnerability Assessment",
+                    "Digital Forensics",
+                    "Identity Management",
+                    "Security Monitoring Agents"
+                  ]
+                },
+                {
+                  "name": "Logistics",
+                  "description": "Transportation, delivery, and supply chain optimization.",
+                  "projectAreas": [
+                    "Route Optimization",
+                    "Supply Chain Analytics",
+                    "Warehouse Automation",
+                    "Fleet Management",
+                    "Delivery Prediction",
+                    "Smart Inventory Systems",
+                    "Last-Mile Delivery",
+                    "Shipment Tracking",
+                    "Demand Forecasting",
+                    "Autonomous Logistics"
+                  ]
+                },
+                {
+                  "name": "Environment & Sustainability",
+                  "description": "Protecting the environment and sustainable development.",
+                  "projectAreas": [
+                    "Carbon Footprint Analysis",
+                    "Waste Management",
+                    "Pollution Monitoring",
+                    "Renewable Energy Optimization",
+                    "Smart Water Management",
+                    "Climate Prediction",
+                    "Green Building Solutions",
+                    "Environmental Risk Assessment",
+                    "Biodiversity Monitoring",
+                    "Sustainability Analytics"
+                  ]
+                },
+                {
+                  "name": "HR & Recruitment",
+                  "description": "Employee management and organizational growth.",
+                  "projectAreas": [
+                    "Employee Attrition Prediction",
+                    "Workforce Analytics",
+                    "HR Chatbots",
+                    "Performance Evaluation",
+                    "Talent Acquisition",
+                    "Employee Engagement",
+                    "Payroll Automation",
+                    "Skill Development Tracking",
+                    "Organizational Analytics",
+                    "Workforce Planning"
+                  ]
+                },
+                {
+                  "name": "Travel & Tourism",
+                  "description": "Enhancing travel experiences and tourism services.",
+                  "projectAreas": [
+                    "Trip Planning Agents",
+                    "Hotel Recommendation Systems",
+                    "Tourism Analytics",
+                    "Smart Travel Assistants",
+                    "Route Optimization",
+                    "Virtual Tourism",
+                    "Personalized Itinerary Generation",
+                    "Travel Risk Assessment",
+                    "Language Assistance Systems",
+                    "Tourist Behavior Analysis"
+                  ]
+                },
+                {
+                  "name": "Government Services",
+                  "description": "Public administration and citizen services.",
+                  "projectAreas": [
+                    "Smart Governance",
+                    "Digital Identity Systems",
+                    "Public Service Automation",
+                    "Citizen Grievance Management",
+                    "Document Verification",
+                    "E-Governance Platforms",
+                    "Welfare Distribution Systems",
+                    "Traffic Management",
+                    "Smart City Solutions",
+                    "Public Data Analytics"
+                  ]
+                },
+                {
+                  "name": "Sports Analytics",
+                  "description": "Performance improvement and sports intelligence.",
+                  "projectAreas": [
+                    "Player Performance Analysis",
+                    "Injury Prediction",
+                    "Match Outcome Prediction",
+                    "Team Strategy Optimization",
+                    "Wearable Sports Analytics",
+                    "Athlete Monitoring",
+                    "Sports Video Analysis",
+                    "Talent Scouting",
+                    "Fan Engagement Platforms",
+                    "Sports Recommendation Systems"
+                  ]
+                },
+                {
+                  "name": "Insurance",
+                  "description": "Risk management and insurance automation.",
+                  "projectAreas": [
+                    "Claim Fraud Detection",
+                    "Insurance Recommendation Systems",
+                    "Risk Assessment Models",
+                    "Automated Claims Processing",
+                    "Premium Prediction",
+                    "Customer Retention Analytics",
+                    "Health Insurance Analytics",
+                    "Vehicle Insurance Systems",
+                    "Policy Management Platforms",
+                    "AI Insurance Agents"
+                  ]
+                },
+                {
+                  "name": "LegalTech",
+                  "description": "Legal document generation, court scheduling, and compliance.",
+                  "projectAreas": [
+                    "Legal Document Generator",
+                    "Court Scheduling Systems",
+                    "Legal Compliance Monitoring"
+                  ]
+                },
+                {
+                  "name": "Media & Journalism",
+                  "description": "Technology for news, content, and information verification.",
+                  "projectAreas": [
+                    "Fake News Detection",
+                    "Deepfake Detection",
+                    "AI News Summarization",
+                    "Personalized News Platforms",
+                    "Content Recommendation Systems",
+                    "Fact-Checking Agents"
+                  ]
+                },
+                {
+                  "name": "Entertainment Technology",
+                  "description": "Technology for movies, music, OTT, and content creation.",
+                  "projectAreas": [
+                    "AI Video Generation",
+                    "Movie Recommendation Systems",
+                    "Music Recommendation Systems",
+                    "Content Moderation",
+                    "Audience Analytics",
+                    "Virtual Influencers"
+                  ]
+                },
+                {
+                  "name": "Smart Cities",
+                  "description": "Urban infrastructure powered by AI and IoT.",
+                  "projectAreas": [
+                    "Smart Traffic Management",
+                    "Intelligent Parking Systems",
+                    "Smart Waste Collection",
+                    "Urban Planning Analytics",
+                    "Public Safety Systems",
+                    "Smart Street Lighting"
+                  ]
+                },
+                {
+                  "name": "Emergency & Disaster Response",
+                  "description": "Disaster prediction and emergency management.",
+                  "projectAreas": [
+                    "Flood Prediction Systems",
+                    "Wildfire Detection",
+                    "Earthquake Damage Assessment",
+                    "Emergency Route Planning",
+                    "Disaster Resource Allocation",
+                    "Rescue Coordination Systems"
+                  ]
+                },
+                {
+                  "name": "Aerospace & Aviation",
+                  "description": "A rapidly growing aviation domain with AI integration.",
+                  "projectAreas": [
+                    "Flight Delay Prediction",
+                    "Drone Intelligence",
+                    "Air Traffic Optimization",
+                    "Predictive Aircraft Maintenance",
+                    "Autonomous UAVs",
+                    "Satellite Analytics"
+                  ]
+                },
+                {
+                  "name": "Marine & Ocean Technology",
+                  "description": "Ocean pollution, fisheries, and underwater systems.",
+                  "projectAreas": [
+                    "Ocean Pollution Monitoring",
+                    "Smart Fisheries",
+                    "Coastal Risk Prediction",
+                    "Marine Ecosystem Analytics",
+                    "Underwater Drone Systems"
+                  ]
+                },
+                {
+                  "name": "Computational Biology",
+                  "description": "Protein structure, gene analysis, and drug discovery.",
+                  "projectAreas": [
+                    "Protein Structure Prediction",
+                    "Gene Analysis",
+                    "Drug Discovery",
+                    "Disease Risk Prediction",
+                    "Personalized Treatment Models"
+                  ]
+                },
+                {
+                  "name": "Human Behavior Analytics",
+                  "description": "AI for understanding human actions and emotions.",
+                  "projectAreas": [
+                    "Emotion Recognition",
+                    "Human Activity Recognition",
+                    "Crowd Behavior Analysis",
+                    "Consumer Behavior Prediction",
+                    "Social Media Intelligence"
+                  ]
+                },
+                {
+                  "name": "Enterprise Automation",
+                  "description": "Intelligent document processing and workflow optimization.",
+                  "projectAreas": [
+                    "Intelligent Document Processing",
+                    "Business Process Automation",
+                    "AI Meeting Assistants",
+                    "Workflow Optimization",
+                    "Enterprise Knowledge Agents"
+                  ]
+                },
+                {
+                  "name": "Industrial Automation",
+                  "description": "Industry 4.0 and manufacturing optimization.",
+                  "projectAreas": [
+                    "Predictive Maintenance",
+                    "Defect Detection",
+                    "Digital Factory Twins",
+                    "Production Optimization",
+                    "Smart Manufacturing Systems"
+                  ]
+                },
+                {
+                  "name": "Battery & EV Technology",
+                  "description": "Electric vehicles, charging, and battery health.",
+                  "projectAreas": [
+                    "EV Charging Optimization",
+                    "Battery Health Prediction",
+                    "Smart Charging Networks",
+                    "Vehicle-to-Grid Systems",
+                    "EV Route Planning"
+                  ]
+                },
+                {
+                  "name": "Knowledge Management",
+                  "description": "Research assistants, knowledge graphs, and search.",
+                  "projectAreas": [
+                    "Research Paper Assistants",
+                    "Knowledge Graph Systems",
+                    "Enterprise Search Engines",
+                    "AI Research Agents",
+                    "Academic Recommendation Systems"
+                  ]
+                },
+                {
+                  "name": "Accessibility Technology",
+                  "description": "Sign translation, navigation, and reading assistants.",
+                  "projectAreas": [
+                    "Sign Language Translation",
+                    "Voice-Based Navigation",
+                    "Smart Wheelchair Systems",
+                    "AI Reading Assistants",
+                    "Accessibility Auditing Tools"
+                  ]
+                },
+                {
+                  "name": "Cognitive Computing",
+                  "description": "Advanced AI reasoning and autonomous decision systems.",
+                  "projectAreas": [
+                    "Multi-Agent Systems",
+                    "Autonomous Decision Systems",
+                    "Explainable AI",
+                    "Human-AI Collaboration",
+                    "Cognitive Assistants"
+                  ]
+                },
+                {
+                  "name": "Space Technology",
+                  "description": "Satellite intelligence, planetary mapping, and debris tracking.",
+                  "projectAreas": [
+                    "Satellite Image Intelligence",
+                    "Space Debris Tracking",
+                    "Orbital Prediction Systems",
+                    "Planetary Mapping",
+                    "Remote Sensing Analytics"
+                  ]
+                },
+                {
+                  "name": "Design Technology",
+                  "description": "AI for interior, logo, fashion, and architecture generation.",
+                  "projectAreas": [
+                    "AI Interior Designers",
+                    "Logo Generation Systems",
+                    "Fashion Recommendation",
+                    "Architecture Generation",
+                    "Creative Content Agents"
+                  ]
+                },
+                {
+                  "name": "Developer Tools",
+                  "description": "Code review, bug detection, and code generation.",
+                  "projectAreas": [
+                    "AI Code Review Systems",
+                    "Automated Bug Detection",
+                    "Code Generation Agents",
+                    "DevOps Intelligence Platforms",
+                    "Software Architecture Assistants"
+                  ]
+                },
+                {
+                  "name": "Digital Humanities",
+                  "description": "Heritage preservation, ancient documents, and cultural graphs.",
+                  "projectAreas": [
+                    "Heritage Preservation",
+                    "Ancient Document Analysis",
+                    "Museum Intelligence Systems",
+                    "Historical Knowledge Graphs",
+                    "Cultural Recommendation Systems"
+                  ]
+                },
+                {
+                  "name": "Research & Scientific Discovery",
+                  "description": "Scientific literature, gap analysis, and experiment design.",
+                  "projectAreas": [
+                    "Scientific Literature Agents",
+                    "Research Gap Identification",
+                    "Automated Experiment Design",
+                    "Citation Intelligence Systems",
+                    "Scientific Knowledge Mining"
+                  ]
+                }
+              ]
+            }
+            """;
     }
 
     @Transactional
