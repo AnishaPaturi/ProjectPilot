@@ -70,6 +70,8 @@ Finding a viable final-year capstone project is a major hurdle for engineering s
 
 ## 📐 Architecture & Multi-Agent Workflow
 
+The system employs a multi-step user interaction flow mapped across a React single page application, a Spring Boot backend orchestrator, a relational MySQL database, and the Google Gemini LLM API.
+
 ```mermaid
 graph TD
     User([Student / User]) -->|1. Select Domain & Project Area| Frontend[React Wizard Dashboard]
@@ -88,6 +90,74 @@ graph TD
     User -->|13. Click Download PDF| Frontend
     Frontend -->|14. Export Styled PDF| PDF[OpenPDF Report Writer]
     PDF -->|15. Clickable IEEE/DOI links| User
+```
+
+---
+
+## 🕸️ Codebase & Entity Knowledge Graph
+
+This graph models the internal code modules, database persistence channels, repository mappings, and external library interfaces of ProjectPilot AI.
+
+```mermaid
+graph TD
+    %% Style Definitions
+    classDef frontend fill:#4f46e5,stroke:#312e81,color:#fff,stroke-width:2px;
+    classDef backend fill:#0891b2,stroke:#083344,color:#fff,stroke-width:2px;
+    classDef database fill:#15803d,stroke:#14532d,color:#fff,stroke-width:2px;
+    classDef external fill:#d97706,stroke:#78350f,color:#fff,stroke-width:2px;
+
+    %% Nodes
+    subgraph Frontend ["React Client Application (Port 5174)"]
+        DASH["Dashboard.jsx (Multi-Step Wizard UI)"]:::frontend
+        API["api.js (Axios REST Services)"]:::frontend
+    end
+
+    subgraph Backend ["Spring Boot Application Server (Port 8080)"]
+        RC["RecommendationController.java (REST Endpoints)"]:::backend
+        RS["RecommendationService.java (Orchestrator)"]:::backend
+        GS["GeminiService.java (LLM REST Client)"]:::backend
+        PS["PdfService.java (OpenPDF Generator)"]:::backend
+        UR["UserRepository.java (JPA Repository)"]:::backend
+        PR["StudentPreferencesRepository.java (JPA)"]:::backend
+        RR["RecommendedPaperRepository.java (JPA)"]:::backend
+        AR["AvoidProjectRepository.java (JPA)"]:::backend
+    end
+
+    subgraph MySQL ["MySQL Database (projectpilot Schema)"]
+        T_USERS["users Table"]:::database
+        T_PREF["student_preferences Table"]:::database
+        T_PAPERS["recommended_papers Table"]:::database
+        T_AVOID["avoid_projects Table"]:::database
+    end
+
+    subgraph External ["External Services"]
+        GEMINI["Gemini 2.5 Flash API (JSON Mode)"]:::external
+        IEEE["IEEE Xplore / DOI Redirects"]:::external
+    end
+
+    %% Relations
+    DASH -->|User Actions| API
+    API -->|REST HTTP Requests| RC
+
+    RC -->|Binds Endpoints| RS
+    RC -->|Streams PDF Bytes| PS
+
+    RS -->|Loads User Profile| UR
+    RS -->|Loads Saved Preferences| PR
+    RS -->|Queries Avoid Projects| AR
+    RS -->|Saves Recommendations| RR
+    RS -->|Invokes Prompt Workflow| GS
+
+    GS -->|POST Request| GEMINI
+
+    UR -->|Performs JPA Queries| T_USERS
+    PR -->|Performs JPA Queries| T_PREF
+    RR -->|Performs JPA Queries| T_PAPERS
+    AR -->|Performs JPA Queries| T_AVOID
+
+    PS -->|Parses Plan JSON| RR
+    PS -->|Creates Title Hyperlink| IEEE
+    RS -->|Resolves Download URLs| IEEE
 ```
 
 ---
