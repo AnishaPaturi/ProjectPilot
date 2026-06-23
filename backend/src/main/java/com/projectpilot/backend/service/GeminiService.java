@@ -1,6 +1,7 @@
 package com.projectpilot.backend.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,15 @@ public class GeminiService {
     public GeminiService() {
         this.restTemplate = new RestTemplate();
         this.objectMapper = new ObjectMapper();
+    }
+
+    @PostConstruct
+    public void init() {
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            System.out.println("GeminiService: API Key is MISSING in environment/application.properties!");
+        } else {
+            System.out.println("GeminiService: API Key loaded successfully (length: " + apiKey.length() + ")");
+        }
     }
 
     public String generateContent(String prompt, boolean jsonMode) {
@@ -65,7 +75,7 @@ public class GeminiService {
                         List parts = (List) content.get("parts");
                         if (parts != null && !parts.isEmpty()) {
                             Map part = (Map) parts.get(0);
-                            return (String) part.get("text");
+                            return cleanJsonResponse((String) part.get("text"));
                         }
                     }
                 }
@@ -174,5 +184,20 @@ public class GeminiService {
         }
 
         return "{}";
+    }
+
+    private String cleanJsonResponse(String responseText) {
+        if (responseText == null) return null;
+        String clean = responseText.trim();
+        if (clean.startsWith("```")) {
+            int firstNewline = clean.indexOf('\n');
+            if (firstNewline != -1) {
+                clean = clean.substring(firstNewline).trim();
+            }
+            if (clean.endsWith("```")) {
+                clean = clean.substring(0, clean.length() - 3).trim();
+            }
+        }
+        return clean;
     }
 }
