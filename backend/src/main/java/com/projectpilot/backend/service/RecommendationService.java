@@ -148,19 +148,30 @@ public class RecommendationService {
 
     @Transactional
     public String suggestBroadDomains() {
-        String prompt = "You are a Computer Science Research Director. Generate a list of 6 trending, cutting-edge broad research domains in Computer Science (e.g. Artificial Intelligence & Machine Learning, Cybersecurity & Cryptography, Cloud Computing, Blockchain, IoT, etc.) that would make strong final-year major projects.\n" +
-            "Return the output in a strict JSON format matching the following schema:\n" +
-            "{\n" +
+        return "{\n" +
             "  \"domains\": [\n" +
-            "    {\n" +
-            "      \"name\": \"Domain Name\",\n" +
-            "      \"description\": \"Brief 1-sentence description of the domain's relevance and scope\"\n" +
-            "    }\n" +
+            "    { \"name\": \"Artificial Intelligence & Machine Learning\", \"description\": \"Neural Networks, Deep Learning, Generative Models, and Predictive Analytics.\" },\n" +
+            "    { \"name\": \"Cybersecurity & Cryptography\", \"description\": \"Network Defense, Threat Detection, Zero-Trust Architecture, and Cryptographic Protocols.\" },\n" +
+            "    { \"name\": \"Software Engineering & Systems\", \"description\": \"Software Architecture, Design Patterns, DevOps pipelines, and System Scalability.\" },\n" +
+            "    { \"name\": \"Cloud Computing & Virtualization\", \"description\": \"Serverless Compute, Container Orchestration (Kubernetes), and Microservices.\" },\n" +
+            "    { \"name\": \"Internet of Things (IoT) & Smart Systems\", \"description\": \"Sensor Networks, Smart Cities, Cyber-Physical Systems, and Edge Computing.\" },\n" +
+            "    { \"name\": \"Data Science & Big Data Analytics\", \"description\": \"Data Warehousing, ETL pipelines, Stream Processing, and Visual Analytics.\" },\n" +
+            "    { \"name\": \"Blockchain & Distributed Ledger\", \"description\": \"Smart Contracts, Decentralized Apps (dApps), DeFi, and Consensus Algorithms.\" },\n" +
+            "    { \"name\": \"Computer Vision & Image Processing\", \"description\": \"Object Detection, Image Segmentation, Facial Recognition, and Video Analysis.\" },\n" +
+            "    { \"name\": \"Natural Language Processing (NLP)\", \"description\": \"Text Mining, Sentiment Analysis, Translation, and Large Language Models.\" },\n" +
+            "    { \"name\": \"AR/VR & Computer Graphics\", \"description\": \"3D Rendering, Virtual Environments, Physics Engines, and Interactive Simulation.\" },\n" +
+            "    { \"name\": \"Mobile & Web Application Architectures\", \"description\": \"Progressive Web Apps, Mobile Frameworks, and High-Performance APIs.\" },\n" +
+            "    { \"name\": \"Bioinformatics & Computational Biology\", \"description\": \"Genomic Sequencing, Protein Structure Folding, and Medical Modeling.\" },\n" +
+            "    { \"name\": \"Quantum Computing & Algorithms\", \"description\": \"Qubits, Quantum Gates, Cryptographic Resilience, and Quantum Simulation.\" },\n" +
+            "    { \"name\": \"Robotics & Autonomous Systems\", \"description\": \"Robotic Control, Autonomous Navigation, Drones, and Sensor Fusion.\" },\n" +
+            "    { \"name\": \"Database Systems & Data Mining\", \"description\": \"SQL/NoSQL Architectures, Indexing Optimizations, and Knowledge Discovery.\" },\n" +
+            "    { \"name\": \"Computer Networks & Communication\", \"description\": \"Protocol Design, SDN (Software Defined Networking), and Wireless Communication.\" },\n" +
+            "    { \"name\": \"Operating Systems & Systems Programming\", \"description\": \"Kernel Development, File Systems, Virtualization, and Device Drivers.\" },\n" +
+            "    { \"name\": \"Human-Computer Interaction (HCI)\", \"description\": \"UI/UX Design Systems, Usability Engineering, and Interactive Devices.\" },\n" +
+            "    { \"name\": \"Theoretical Computer Science\", \"description\": \"Formal Verification, Automata Theory, Complexity Theory, and Cryptographic Proofs.\" },\n" +
+            "    { \"name\": \"Distributed Systems & Parallel Computing\", \"description\": \"High-Performance Computing, Consensus Protocols (Paxos, Raft), and Grid Computing.\" }\n" +
             "  ]\n" +
-            "}\n\n" +
-            "Make sure the response contains ONLY valid JSON and nothing else.";
-
-        return geminiService.generateContent(prompt, true);
+            "}";
     }
 
     @Transactional

@@ -16,6 +16,7 @@ export default function Dashboard({ userId }) {
   const [subdomains, setSubdomains] = useState([]);
   const [selectedSubdomain, setSelectedSubdomain] = useState('');
   const [customDomain, setCustomDomain] = useState('');
+  const [domainFilter, setDomainFilter] = useState('');
   const [domains, setDomains] = useState([]);
   const [domainsLoading, setDomainsLoading] = useState(false);
 
@@ -84,6 +85,7 @@ export default function Dashboard({ userId }) {
     setSubdomains([]);
     setSelectedSubdomain('');
     setCustomDomain('');
+    setDomainFilter('');
     setError('');
     setWizardStep('select-broad-domain');
     setDomainsLoading(true);
@@ -156,6 +158,11 @@ export default function Dashboard({ userId }) {
     setActiveTabs({ ...activeTabs, [paperId]: tab });
   };
 
+  const filteredDomains = domains.filter(dom => 
+    dom.name.toLowerCase().includes(domainFilter.toLowerCase()) || 
+    dom.description.toLowerCase().includes(domainFilter.toLowerCase())
+  );
+
   if (fetching) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -199,6 +206,21 @@ export default function Dashboard({ userId }) {
             </div>
           ) : (
             <div className="space-y-6">
+              {/* Search & Filter Input */}
+              <div className="glass-panel rounded-2xl p-6 border border-slate-900 bg-slate-950/20 shadow-xl space-y-3">
+                <h3 className="text-slate-300 text-sm font-semibold">Search CS Domains</h3>
+                <p className="text-slate-500 text-xs">
+                  Quickly filter the exhaustive list of 20 core CS domains.
+                </p>
+                <input
+                  type="text"
+                  value={domainFilter}
+                  onChange={(e) => setDomainFilter(e.target.value)}
+                  placeholder="Type a keyword to filter (e.g. security, cloud, intelligence, software...)"
+                  className="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl py-3 px-4 text-slate-100 placeholder-slate-700 outline-none transition-all text-sm"
+                />
+              </div>
+
               {/* Custom Domain Input */}
               <div className="glass-panel rounded-2xl p-6 border border-slate-900 bg-slate-950/20 shadow-xl space-y-3">
                 <h3 className="text-slate-300 text-sm font-semibold">Or Type a Custom Research Domain</h3>
@@ -231,7 +253,7 @@ export default function Dashboard({ userId }) {
 
               {/* Grid of Auto-Generated Domains */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {domains.map((dom, index) => {
+                {filteredDomains.map((dom, index) => {
                   const style = getDomainStyle(index, dom.name);
                   return (
                     <div
@@ -258,6 +280,12 @@ export default function Dashboard({ userId }) {
                   );
                 })}
               </div>
+
+              {filteredDomains.length === 0 && (
+                <div className="glass-panel rounded-2xl p-12 text-center border border-slate-900 bg-slate-950/20">
+                  <p className="text-slate-400 text-sm">No domains match your search keyword. Try typing it in the custom entry box above!</p>
+                </div>
+              )}
             </div>
           )}
         </div>
